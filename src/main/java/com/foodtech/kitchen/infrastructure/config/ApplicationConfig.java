@@ -20,9 +20,11 @@ import com.foodtech.kitchen.infrastructure.security.JwtTokenValidator;
 import com.foodtech.kitchen.infrastructure.security.JwtTokenGenerator;
 import com.foodtech.kitchen.infrastructure.serialization.JacksonPayloadSerializer;
 import com.foodtech.kitchen.infrastructure.transactional.TransactionalOrderCompletionService;
+import com.foodtech.kitchen.infrastructure.transactional.TransactionalDeleteOrderPort;
 import com.foodtech.kitchen.infrastructure.transactional.TransactionalProcessOrderPort;
 import com.foodtech.kitchen.infrastructure.transactional.TransactionalRequestOrderInvoicePort;
 import com.foodtech.kitchen.infrastructure.transactional.TransactionalStartTaskPreparationPort;
+import com.foodtech.kitchen.infrastructure.transactional.TransactionalUpdateOrderPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
@@ -173,6 +175,36 @@ public class ApplicationConfig {
     @Bean
     public GetOrderStatusPort getOrderStatusPort(GetOrderStatusUseCase getOrderStatusUseCase) {
         return getOrderStatusUseCase;
+    }
+
+    @Bean
+    public GetOrderByIdUseCase getOrderByIdUseCase(OrderRepository orderRepository) {
+        return new GetOrderByIdUseCase(orderRepository);
+    }
+
+    @Bean
+    public GetOrderByIdPort getOrderByIdPort(GetOrderByIdUseCase getOrderByIdUseCase) {
+        return getOrderByIdUseCase;
+    }
+
+    @Bean
+    public UpdateOrderUseCase updateOrderUseCase(OrderRepository orderRepository) {
+        return new UpdateOrderUseCase(orderRepository);
+    }
+
+    @Bean
+    public UpdateOrderPort updateOrderPort(UpdateOrderUseCase updateOrderUseCase) {
+        return new TransactionalUpdateOrderPort(updateOrderUseCase);
+    }
+
+    @Bean
+    public DeleteOrderUseCase deleteOrderUseCase(OrderRepository orderRepository) {
+        return new DeleteOrderUseCase(orderRepository);
+    }
+
+    @Bean
+    public DeleteOrderPort deleteOrderPort(DeleteOrderUseCase deleteOrderUseCase) {
+        return new TransactionalDeleteOrderPort(deleteOrderUseCase);
     }
 
     @Bean
