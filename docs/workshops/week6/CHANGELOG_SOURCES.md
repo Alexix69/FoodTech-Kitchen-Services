@@ -1,4 +1,4 @@
-	## 1. PRD
+## 1. PRD (Product Requirements Document)
 
 - Se verifica en primer lugar qué documento se va a construir para tener claro el objetivo final.
 - Para ello se consultaron diversas fuentes con el fin de conceptualizar qué es el documento, qué contiene y cómo se estructura correctamente.
@@ -19,3 +19,19 @@
 ### b) IA
 
 - Se utilizó únicamente para generar el formato estructural inicial del documento, entregando una plantilla vacía desde la cual se partió para construir el contenido.
+
+## 2. Planteamiento del problema
+
+### a) Humano
+
+#### Qué es
+1. https://www.questionpro.com/blog/es/planteamiento-del-problema/#Que_es_el_planteamiento_del_problema
+
+### b) IA
+
+- Generación de preguntas clave para refinamiento del planteamiento del problema:
+  - ¿El problema identificado corresponde realmente a la falta de actualización en tiempo real o a una ausencia de definición de roles dentro del sistema?
+  - ¿Qué acciones puede realizar actualmente un mismo usuario que, en un entorno real, deberían estar separadas por responsabilidad operativa?
+  - ¿El sistema controla quién debe iniciar, gestionar y completar la preparación de las órdenes, o permite que cualquier usuario ejecute estas acciones?
+  - ¿La información del estado de las órdenes está dirigida a los actores correctos o se encuentra disponible sin segmentación para todos los usuarios?
+  - ¿El flujo actual del sistema representa correctamente el funcionamiento real de un restaurante o simplifica en exceso la interacción entre mesero, cocina y barra?
