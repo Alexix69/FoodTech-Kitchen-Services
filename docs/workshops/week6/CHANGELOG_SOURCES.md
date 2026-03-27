@@ -50,3 +50,18 @@
 #### 1.2 Definition of Done
 1. https://www.atlassian.com/es/agile/project-management/definition-of-done
 2. https://www.scrumio.com/scrum/definicion-de-hecho
+
+## 4. RBAC
+
+### a) Humano
+
+#### Qué es
+1. https://www.ibm.com/mx-es/think/topics/rbac
+2. https://www.cloudflare.com/es-es/learning/access-management/role-based-access-control-rbac/
+
+#### Beneficios
+1. https://www.styra.com/blog/what-is-rbac-examples-benefits-and-implementation/
+
+### b) IA
+1. https://learn.microsoft.com/en-us/azure/role-based-access-control/overview
+2. https://auth0.com/docs/manage-users/access-control/rbac
