@@ -75,3 +75,14 @@
 
 ### b) IA
 1. https://refactoring.guru/design-patterns
+
+## 6. Tiempo real en aplicaciones
+
+### a) Humano
+1. https://codigofacilito.com/articulos/como-programar-aplicaciones-en-tiempo-real
+2. https://www.pubnub.com/blog/what-is-a-real-time-app-and-why-does-it-matter/
+3. https://www.ramotion.com/blog/real-time-web-app-development/
+
+### b) IA
+1. *(Fuera del enfoque)* https://firebase.google.com/docs/database
+2. *(Alucinación)* https://ably.com/topic/what-is-realtime?q=topic%20what%20is%20realtime
