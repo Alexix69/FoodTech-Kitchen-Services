@@ -86,3 +86,25 @@
 ### b) IA
 1. *(Fuera del enfoque)* https://firebase.google.com/docs/database
 2. *(Alucinación)* https://ably.com/topic/what-is-realtime?q=topic%20what%20is%20realtime
+
+## 7. Sockets
+
+### a) Humano
+1. https://youtu.be/0FWJC3GP0aU?si=EhVo-viN0TJcAF2m
+2. https://www.ibm.com/docs/es/aix/7.3.0?topic=concepts-sockets
+3. https://medium.com/@onix_react/what-are-sockets-and-what-are-sockets-for-8eef56436b7b
+4. https://www.geeknetic.es/Socket/que-es-y-para-que-sirve
+
+### b) IA
+1. https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
+
+## 8. Modelado de estados
+
+### a) Humano
+1. https://www.lucidchart.com/pages/es/diagrama-de-maquina-de-estados
+2. https://miro.com/es/diagrama/que-es-diagrama-maquina-estados-uml/
+3. https://www.ni.com/es/support/documentation/supplemental/16/simple-state-machine-template-documentation.html?srsltid=AfmBOorZtcaVi363ALrirdBfJAZ5XkBIStMNPCTksSARFVvAG7MXnx_H
+
+### b) IA
+1. https://plantuml.com/state-diagram
+2. https://martinfowler.com/eaaDev/EventSourcing.html
