@@ -108,3 +108,16 @@
 ### b) IA
 1. https://plantuml.com/state-diagram
 2. https://martinfowler.com/eaaDev/EventSourcing.html
+
+## 9. Análisis de riesgos en un PRD
+
+### a) Humano
+1. https://asana.com/es/resources/project-risks
+2. https://visuresolutions.com/es/gu%C3%Иa-de-limosna/an%C3%A1lisis-de-riesgo/#:~:text=El%20an%C3%A1lisis%20de%20riesgos%20es%20el%20proceso%20de%20identificar%20riesgos,el%20logro%20de%20sus%20objetivos.
+3. https://youtu.be/sz68nzK1tWQ?si=IMrQ-VEP1AwozKBV
+4. https://www.geeksforgeeks.org/software-engineering/software-risk-analysis/
+
+### b) IA
+1. https://owasp.org/www-project-top-ten/
+2. https://chatgpt.com/g/g-p-698cb323fe888191a693785bfadea0ec/c/69c31080-7770-83e9-bc54-4fa57a139ee1
+3. https://cloud.google.com/architecture/framework
