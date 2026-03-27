@@ -35,3 +35,18 @@
   - ¿El sistema controla quién debe iniciar, gestionar y completar la preparación de las órdenes, o permite que cualquier usuario ejecute estas acciones?
   - ¿La información del estado de las órdenes está dirigida a los actores correctos o se encuentra disponible sin segmentación para todos los usuarios?
   - ¿El flujo actual del sistema representa correctamente el funcionamiento real de un restaurante o simplifica en exceso la interacción entre mesero, cocina y barra?
+
+## 3. Historias de Usuario
+
+### a) Humano
+
+#### Qué es
+1. https://www.atlassian.com/es/agile/project-management/user-stories
+
+#### 1.1 Criterios de aceptación
+1. https://www.atlassian.com/es/work-management/project-management/acceptance-criteria
+2. https://resources.scrumalliance.org/Article/need-know-acceptance-criteria
+
+#### 1.2 Definition of Done
+1. https://www.atlassian.com/es/agile/project-management/definition-of-done
+2. https://www.scrumio.com/scrum/definicion-de-hecho
