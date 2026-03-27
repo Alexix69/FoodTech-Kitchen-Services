@@ -65,3 +65,13 @@
 ### b) IA
 1. https://learn.microsoft.com/en-us/azure/role-based-access-control/overview
 2. https://auth0.com/docs/manage-users/access-control/rbac
+
+## 5. Diseño de software
+
+### a) Humano
+1. https://www.arcusway.com/post/diseno-de-software-por-donde-empezar-y-modelos
+2. https://www.arcusway.com/post/desarrollo-de-software-guia-definitiva-para-tu-empresa
+3. https://www.youtube.com/live/vrTfxHcYUnk?si=oh4mfpnOAGdpgDY8
+
+### b) IA
+1. https://refactoring.guru/design-patterns
