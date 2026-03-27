@@ -76,7 +76,19 @@
 ### b) IA
 1. https://refactoring.guru/design-patterns
 
-## 6. Tiempo real en aplicaciones
+## 6. Arquitectura en un PRD
+
+### a) Humano
+1. https://miro.com/product-development/what-is-a-prd/
+2. https://ecuador.unir.net/actualidad-unir/arquitectura-software/
+3. https://mox.one/es/blog/el-impacto-de-la-programacion-en-el-diseno-y-arquitectura-de-software
+
+### b) IA
+1. https://aws.amazon.com/architecture/
+2. https://learn.microsoft.com/en-us/azure/architecture/
+3. *(Alucinación)* https://www.atlassian.com/work-management/product-management/product-requirements
+
+## 7. Tiempo real en aplicaciones
 
 ### a) Humano
 1. https://codigofacilito.com/articulos/como-programar-aplicaciones-en-tiempo-real
@@ -87,7 +99,7 @@
 1. *(Fuera del enfoque)* https://firebase.google.com/docs/database
 2. *(Alucinación)* https://ably.com/topic/what-is-realtime?q=topic%20what%20is%20realtime
 
-## 7. Sockets
+## 8. Sockets
 
 ### a) Humano
 1. https://youtu.be/0FWJC3GP0aU?si=EhVo-viN0TJcAF2m
@@ -98,7 +110,7 @@
 ### b) IA
 1. https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
 
-## 8. Modelado de estados
+## 9. Modelado de estados
 
 ### a) Humano
 1. https://www.lucidchart.com/pages/es/diagrama-de-maquina-de-estados
@@ -109,7 +121,7 @@
 1. https://plantuml.com/state-diagram
 2. https://martinfowler.com/eaaDev/EventSourcing.html
 
-## 9. Análisis de riesgos en un PRD
+## 10. Análisis de riesgos en un PRD
 
 ### a) Humano
 1. https://asana.com/es/resources/project-risks
