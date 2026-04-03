@@ -11,6 +11,7 @@ import com.foodtech.kitchen.domain.model.Order;
 import com.foodtech.kitchen.domain.model.OrderStatus;
 import com.foodtech.kitchen.domain.model.Task;
 import com.foodtech.kitchen.domain.model.TaskStatus;
+import com.foodtech.kitchen.domain.model.UserRole;
 import com.foodtech.kitchen.domain.ports.out.AsyncCommandDispatcher;
 import com.foodtech.kitchen.domain.services.CommandFactory;
 import org.junit.jupiter.api.Tag;
@@ -88,7 +89,7 @@ class StartTaskPreparationUseCaseTest {
         when(commandFactory.createCommand(any(), any())).thenReturn(command);
 
         // When
-        Task result = useCase.execute(taskId);
+        Task result = useCase.execute(taskId, UserRole.BARTENDER);
 
         // Then
         assertNotNull(result);
@@ -106,9 +107,57 @@ class StartTaskPreparationUseCaseTest {
         when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
 
         // When / Then
-        assertThrows(TaskNotFoundException.class, () -> useCase.execute(taskId));
+        assertThrows(TaskNotFoundException.class, () -> useCase.execute(taskId, UserRole.COCINERO));
         verify(taskRepository).findById(taskId);
         verify(taskRepository, never()).save(any(Task.class));
         verifyNoInteractions(asyncCommandDispatcher);
+    }
+
+    @Test
+    void shouldThrowAccessDeniedWhenBartenderTriesHotKitchenTask() {
+        Long taskId = 10L;
+        LocalDateTime now = LocalDateTime.of(2026, 2, 20, 12, 0);
+        Product product = new Product("Burger", ProductType.HOT_DISH);
+        Task pendingTask = Task.reconstruct(
+                taskId, 1L, Station.HOT_KITCHEN, "A1", List.of(product),
+                now, TaskStatus.PENDING, null, null
+        );
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(pendingTask));
+
+        assertThrows(
+            com.foodtech.kitchen.application.exceptions.AccessDeniedException.class,
+            () -> useCase.execute(taskId, UserRole.BARTENDER)
+        );
+
+        verify(taskRepository, never()).save(any(Task.class));
+        verifyNoInteractions(asyncCommandDispatcher);
+    }
+
+    @Test
+    void shouldProceedWhenCocinairoStartsHotKitchenTask() {
+        Long taskId = 11L;
+        LocalDateTime now = LocalDateTime.of(2026, 2, 20, 12, 0);
+        Product product = new Product("Burger", ProductType.HOT_DISH);
+        Task pendingTask = Task.reconstruct(
+                taskId, 1L, Station.HOT_KITCHEN, "A1", List.of(product),
+                now, TaskStatus.PENDING, null, null
+        );
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(pendingTask));
+        when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        when(orderRepository.findById(1L))
+                .thenReturn(Optional.of(Order.reconstruct(1L, "A1", List.of(product), OrderStatus.CREATED)));
+        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Command command = mock(Command.class);
+        when(commandFactory.createCommand(any(), any())).thenReturn(command);
+
+        Task result = useCase.execute(taskId, UserRole.COCINERO);
+
+        assertNotNull(result);
+        assertEquals(TaskStatus.IN_PREPARATION, result.getStatus());
+        verify(asyncCommandDispatcher).dispatch(command, taskId);
     }
 }

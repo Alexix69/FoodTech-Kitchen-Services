@@ -1,5 +1,6 @@
 package com.foodtech.kitchen.infrastructure.security;
 
+import com.foodtech.kitchen.domain.model.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -27,7 +28,7 @@ class JwtTokenGeneratorTest {
         Clock clock = Clock.fixed(fixedInstant, ZoneOffset.UTC);
         JwtTokenGenerator generator = new JwtTokenGenerator(secret, expirationSeconds, clock);
 
-        String token = generator.generateToken("alice");
+        String token = generator.generateToken("alice", UserRole.MESERO);
 
         assertNotNull(token);
         assertFalse(token.isBlank());

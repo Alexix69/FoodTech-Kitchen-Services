@@ -58,4 +58,45 @@ class GetTasksByStationUseCaseTest {
         assertTrue(tasks.isEmpty());
         verify(taskRepository, times(1)).findByStationsAndStatus(Set.of(Station.BAR), TaskStatus.PENDING);
     }
+
+    @Test
+    @DisplayName("COCINERO stations HOT_KITCHEN and COLD_KITCHEN return tasks from both")
+    void shouldReturnTasksFromBothCocinairoStations() {
+        LocalDateTime now = LocalDateTime.now();
+        Product hotDish = new Product("Burger", ProductType.HOT_DISH);
+        Product coldDish = new Product("Salad", ProductType.COLD_DISH);
+
+        Task hotTask = new Task(1L, Station.HOT_KITCHEN, "A1", List.of(hotDish), now);
+        Task coldTask = new Task(2L, Station.COLD_KITCHEN, "A2", List.of(coldDish), now);
+
+        Set<Station> cocinairoStations = Set.of(Station.HOT_KITCHEN, Station.COLD_KITCHEN);
+        when(taskRepository.findByStationsAndStatus(cocinairoStations, TaskStatus.PENDING))
+            .thenReturn(List.of(hotTask, coldTask));
+
+        List<Task> tasks = useCase.execute(cocinairoStations, TaskStatus.PENDING);
+
+        assertEquals(2, tasks.size());
+        assertTrue(tasks.stream().anyMatch(t -> t.getStation() == Station.HOT_KITCHEN));
+        assertTrue(tasks.stream().anyMatch(t -> t.getStation() == Station.COLD_KITCHEN));
+        verify(taskRepository).findByStationsAndStatus(cocinairoStations, TaskStatus.PENDING);
+    }
+
+    @Test
+    @DisplayName("BARTENDER station BAR returns only BAR tasks")
+    void shouldReturnOnlyBarTasksForBartender() {
+        LocalDateTime now = LocalDateTime.now();
+        Product drink = new Product("Beer", ProductType.DRINK);
+
+        Task barTask = new Task(3L, Station.BAR, "A3", List.of(drink), now);
+
+        Set<Station> bartenderStations = Set.of(Station.BAR);
+        when(taskRepository.findByStationsAndStatus(bartenderStations, TaskStatus.PENDING))
+            .thenReturn(List.of(barTask));
+
+        List<Task> tasks = useCase.execute(bartenderStations, TaskStatus.PENDING);
+
+        assertEquals(1, tasks.size());
+        assertEquals(Station.BAR, tasks.get(0).getStation());
+        verify(taskRepository).findByStationsAndStatus(bartenderStations, TaskStatus.PENDING);
+    }
 }

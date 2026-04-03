@@ -1,5 +1,6 @@
 package com.foodtech.kitchen.infrastructure.rest;
 
+import com.foodtech.kitchen.application.model.AuthResponse;
 import com.foodtech.kitchen.application.usecases.AuthenticateUserUseCase;
 import com.foodtech.kitchen.application.usecases.RegisterUserUseCase;
 import com.foodtech.kitchen.infrastructure.rest.dto.LoginRequest;
@@ -28,16 +29,13 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) {
-        // ⚕️ HUMAN CHECK: Exception mapping is delegated to GlobalExceptionHandler.
-        // Controller must not swallow domain/application exceptions.
         registerUserUseCase.execute(request.username(), request.email(), request.password());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        String token = authenticateUserUseCase.execute(request.identifier(), request.password());
-        return ResponseEntity.ok(new LoginResponse(token));
+        AuthResponse authResponse = authenticateUserUseCase.execute(request.identifier(), request.password());
+        return ResponseEntity.ok(new LoginResponse(authResponse.token()));
     }
-
 }

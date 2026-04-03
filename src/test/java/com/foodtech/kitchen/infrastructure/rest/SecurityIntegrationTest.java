@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.foodtech.kitchen.domain.model.UserRole;
 import com.foodtech.kitchen.infrastructure.security.JwtTokenGenerator;
 import java.time.Clock;
 import java.time.Instant;
@@ -74,7 +75,7 @@ class SecurityIntegrationTest {
         Instant fixedInstant = Instant.parse("2020-01-01T00:00:00Z");
         Clock fixedClock = Clock.fixed(fixedInstant, ZoneOffset.UTC);
         JwtTokenGenerator generator = new JwtTokenGenerator(jwtSecret, 1L, fixedClock);
-        String expiredToken = generator.generateToken("auth-user");
+        String expiredToken = generator.generateToken("auth-user", UserRole.MESERO);
 
         mockMvc.perform(get("/api/tasks/station/BAR")
                 .header("Authorization", "Bearer " + expiredToken))
@@ -99,7 +100,7 @@ class SecurityIntegrationTest {
                 3600L,
                 fixedClock
         );
-        String invalidSignatureToken = generator.generateToken("auth-user");
+        String invalidSignatureToken = generator.generateToken("auth-user", UserRole.MESERO);
 
         mockMvc.perform(get("/api/tasks/station/BAR")
                 .header("Authorization", "Bearer " + invalidSignatureToken))

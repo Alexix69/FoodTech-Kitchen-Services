@@ -2,6 +2,7 @@ package com.foodtech.kitchen.infrastructure.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foodtech.kitchen.application.ports.out.TokenGenerator;
+import com.foodtech.kitchen.domain.model.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +40,7 @@ class OrderControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        authHeaderValue = "Bearer " + tokenGenerator.generateToken("test-user");
+        authHeaderValue = "Bearer " + tokenGenerator.generateToken("test-user", UserRole.MESERO);
     }
 
     private RequestPostProcessor auth() {

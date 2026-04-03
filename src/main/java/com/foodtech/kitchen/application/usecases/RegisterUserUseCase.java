@@ -5,6 +5,7 @@ import com.foodtech.kitchen.application.ports.out.UserRepository;
 import com.foodtech.kitchen.application.exceptions.DuplicateEmailException;
 import com.foodtech.kitchen.application.exceptions.DuplicateUsernameException;
 import com.foodtech.kitchen.domain.model.User;
+import com.foodtech.kitchen.domain.model.UserRole;
 import com.foodtech.kitchen.domain.model.UserStatus;
 
 public class RegisterUserUseCase {
@@ -28,6 +29,10 @@ public class RegisterUserUseCase {
         String passwordHash = passwordHasher.hash(rawPassword);
         User user = new User(username, email, passwordHash, UserStatus.ACTIVE);
         return userRepository.save(user);
+    }
+
+    public User execute(String username, String email, String rawPassword, UserRole role) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     private void validateEmail(String email) {

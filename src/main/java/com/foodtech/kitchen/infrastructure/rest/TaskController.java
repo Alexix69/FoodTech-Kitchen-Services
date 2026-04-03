@@ -37,7 +37,7 @@ public class TaskController {
 
     @PatchMapping("/{id}/start")
     public ResponseEntity<TaskResponse> startTaskPreparation(@PathVariable Long id) {
-        Task task = startTaskPreparationPort.execute(id);
+        Task task = startTaskPreparationPort.execute(id, null);
         TaskResponse response = TaskMapper.toResponse(task);
         return ResponseEntity.ok(response);
     }

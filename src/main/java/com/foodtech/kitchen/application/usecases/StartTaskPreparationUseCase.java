@@ -8,8 +8,10 @@ import com.foodtech.kitchen.application.ports.out.TaskRepository;
 import com.foodtech.kitchen.domain.commands.Command;
 import com.foodtech.kitchen.domain.model.Order;
 import com.foodtech.kitchen.domain.model.Task;
+import com.foodtech.kitchen.domain.model.UserRole;
 import com.foodtech.kitchen.domain.ports.out.AsyncCommandDispatcher;
 import com.foodtech.kitchen.domain.services.CommandFactory;
+
 public class StartTaskPreparationUseCase implements StartTaskPreparationPort {
 
     private final TaskRepository taskRepository;
@@ -30,7 +32,7 @@ public class StartTaskPreparationUseCase implements StartTaskPreparationPort {
     }
 
     @Override
-    public Task execute(Long taskId) {
+    public Task execute(Long taskId, UserRole callerRole) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException(taskId));
 

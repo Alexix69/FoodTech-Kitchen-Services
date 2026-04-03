@@ -1,5 +1,6 @@
 package com.foodtech.kitchen.application.usecases;
 
+import com.foodtech.kitchen.application.model.AuthResponse;
 import com.foodtech.kitchen.application.ports.out.PasswordHasher;
 import com.foodtech.kitchen.application.ports.out.TokenGenerator;
 import com.foodtech.kitchen.application.ports.out.UserRepository;
@@ -19,7 +20,7 @@ public class AuthenticateUserUseCase {
         this.passwordHasher = passwordHasher;
     }
 
-    public String execute(String identifier, String password) {
+    public AuthResponse execute(String identifier, String password) {
         User user = userRepository.findByEmailOrUsername(identifier)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         if (!passwordHasher.matches(password, user.getPasswordHash())) {
@@ -28,6 +29,7 @@ public class AuthenticateUserUseCase {
         if (user.getStatus() != UserStatus.ACTIVE) {
             throw new IllegalArgumentException("User is not active");
         }
-        return tokenGenerator.generateToken(user.getUsername());
+        String token = tokenGenerator.generateToken(user.getUsername(), user.getRole());
+        return new AuthResponse(token, user.getRole());
     }
 }

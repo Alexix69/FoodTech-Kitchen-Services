@@ -1,6 +1,7 @@
 package com.foodtech.kitchen.application.usecases;
 
 import com.foodtech.kitchen.domain.model.User;
+import com.foodtech.kitchen.domain.model.UserRole;
 import com.foodtech.kitchen.domain.model.UserStatus;
 import com.foodtech.kitchen.application.ports.out.PasswordHasher;
 import com.foodtech.kitchen.application.ports.out.UserRepository;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -105,5 +107,34 @@ class RegisterUserUseCaseTest {
 
         verify(passwordHasher, never()).hash(any());
         verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void registerUser_withRole_persistsRoleInUser() {
+        String username = "jdoe";
+        String email = "jdoe@example.com";
+        String password = "abc123";
+        UserRole role = UserRole.COCINERO;
+
+        when(passwordHasher.hash(password)).thenReturn("hashed");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        User result = registerUserUseCase.execute(username, email, password, role);
+
+        assertNotNull(result);
+        assertTrue(result.hasRole());
+        assertEquals(role, result.getRole());
+    }
+
+    @Test
+    void registerUser_withNullRole_throwsIllegalArgumentException() {
+        String username = "jdoe";
+        String email = "jdoe@example.com";
+        String password = "abc123";
+
+        assertThrows(IllegalArgumentException.class,
+            () -> registerUserUseCase.execute(username, email, password, null));
+
+        verify(userRepository, never()).save(any(User.class));
     }
 }

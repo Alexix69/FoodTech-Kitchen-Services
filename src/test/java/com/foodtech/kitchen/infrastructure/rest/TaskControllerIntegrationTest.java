@@ -3,6 +3,7 @@ package com.foodtech.kitchen.infrastructure.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foodtech.kitchen.application.ports.out.TokenGenerator;
 import com.foodtech.kitchen.application.ports.out.TaskRepository;
+import com.foodtech.kitchen.domain.model.UserRole;
 import com.foodtech.kitchen.domain.model.Station;
 import com.foodtech.kitchen.domain.model.Task;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +48,7 @@ class TaskControllerIntegrationTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        authHeaderValue = "Bearer " + tokenGenerator.generateToken("test-user");
+        authHeaderValue = "Bearer " + tokenGenerator.generateToken("test-user", UserRole.COCINERO);
 
         // Given - Preparar datos: 3 tareas (2 BAR, 1 HOT_KITCHEN)
         
