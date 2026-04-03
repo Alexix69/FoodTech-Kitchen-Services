@@ -51,4 +51,23 @@ class PrepareDrinkCommandTest {
         // Then
         assertInstanceOf(PrepareDrinkCommand.class, command);
     }
+
+    /**
+     * BE1-04 / FR-029: simulation removed — execute() must not sleep.
+     * With Thread.sleep(3s per drink), a 1-drink command would take >= 3000ms.
+     * After removing the simulation, execution must complete in < 500ms.
+     */
+    @Test
+    @DisplayName("FR-029: execute() must complete without Thread.sleep simulation (< 500ms)")
+    void execute_completesWithoutSimulation_noThreadSleep() {
+        Product cocaCola = new Product("Coca Cola", ProductType.DRINK);
+        PrepareDrinkCommand command = new PrepareDrinkCommand(List.of(cocaCola));
+
+        long start = System.currentTimeMillis();
+        command.execute();
+        long elapsed = System.currentTimeMillis() - start;
+
+        assertTrue(elapsed < 500,
+                "execute() slept for " + elapsed + "ms — Thread.sleep simulation must be removed (FR-029)");
+    }
 }

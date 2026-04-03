@@ -36,4 +36,23 @@ class PrepareColdDishCommandTest {
         // When & Then
         assertDoesNotThrow(() -> command.execute());
     }
+
+    /**
+     * BE1-06 / FR-029: simulation removed — execute() must not sleep.
+     * With Thread.sleep(5s per dish), one dish would take >= 5000ms.
+     * After removing the simulation, execution must complete in < 500ms.
+     */
+    @Test
+    @DisplayName("FR-029: execute() must complete without Thread.sleep simulation (< 500ms)")
+    void execute_completesWithoutSimulation_noThreadSleep() {
+        Product salad = new Product("Caesar Salad", ProductType.COLD_DISH);
+        PrepareColdDishCommand command = new PrepareColdDishCommand(List.of(salad));
+
+        long start = System.currentTimeMillis();
+        command.execute();
+        long elapsed = System.currentTimeMillis() - start;
+
+        assertTrue(elapsed < 500,
+                "execute() slept for " + elapsed + "ms — Thread.sleep simulation must be removed (FR-029)");
+    }
 }
