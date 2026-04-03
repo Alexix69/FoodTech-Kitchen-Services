@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Tag;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -28,39 +29,33 @@ class GetTasksByStationUseCaseTest {
     @Test
     @DisplayName("Should return only tasks for specified station")
     void shouldReturnOnlyTasksForSpecifiedStation() {
-        // Given - 3 tareas pendientes: 2 BAR, 1 HOT_KITCHEN
         Product cocaCola = new Product("Coca Cola", ProductType.DRINK);
         Product sprite = new Product("Sprite", ProductType.DRINK);
-        
+
         LocalDateTime now = LocalDateTime.now();
         Task barTask1 = new Task(1L, Station.BAR, "A1", List.of(cocaCola), now);
         Task barTask2 = new Task(1L, Station.BAR, "A2", List.of(sprite), now);
-        
-        when(taskRepository.findByStation(Station.BAR))
+
+        when(taskRepository.findByStationsAndStatus(Set.of(Station.BAR), TaskStatus.PENDING))
             .thenReturn(List.of(barTask1, barTask2));
 
-        // When - el encargado de barra consulta sus tareas
-        List<Task> tasks = useCase.execute(Station.BAR, null);
+        List<Task> tasks = useCase.execute(Set.of(Station.BAR), TaskStatus.PENDING);
 
-        // Then - el sistema muestra únicamente las 2 tareas de barra
         assertEquals(2, tasks.size());
         assertTrue(tasks.stream().allMatch(task -> task.getStation() == Station.BAR));
-        verify(taskRepository, times(1)).findByStation(Station.BAR);
+        verify(taskRepository, times(1)).findByStationsAndStatus(Set.of(Station.BAR), TaskStatus.PENDING);
     }
 
     @Test
     @DisplayName("Should return empty list when no tasks for station")
     void shouldReturnEmptyListWhenNoTasksForStation() {
-        // Given - no hay tareas asignadas a la estación de barra
-        when(taskRepository.findByStation(Station.BAR))
+        when(taskRepository.findByStationsAndStatus(Set.of(Station.BAR), TaskStatus.PENDING))
             .thenReturn(List.of());
 
-        // When - el encargado de barra consulta sus tareas
-        List<Task> tasks = useCase.execute(Station.BAR, null);
+        List<Task> tasks = useCase.execute(Set.of(Station.BAR), TaskStatus.PENDING);
 
-        // Then - el sistema muestra que no hay tareas pendientes
         assertNotNull(tasks);
         assertTrue(tasks.isEmpty());
-        verify(taskRepository, times(1)).findByStation(Station.BAR);
+        verify(taskRepository, times(1)).findByStationsAndStatus(Set.of(Station.BAR), TaskStatus.PENDING);
     }
 }

@@ -9,11 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-//HUMAN REVIEW: Simplifiqué adapter inyectando TaskEntityMapper dedicado.
-//Cumple SRP: este adapter solo adapta entre JPA y dominio, mapper maneja serialización.
-//Elimina duplicación: ProductDto y lógica JSON centralizados en mapper.
 @Component
 public class TaskRepositoryAdapter implements TaskRepository {
 
@@ -43,7 +41,7 @@ public class TaskRepositoryAdapter implements TaskRepository {
 
     @Override
     public Optional<Task> findById(Long id) {
-        return jpaRepository.findByIdWithProducts(id) // ✅ Usar eager fetch
+        return jpaRepository.findByIdWithProducts(id)
                 .map(mapper::toDomain);
     }
 
@@ -57,6 +55,20 @@ public class TaskRepositoryAdapter implements TaskRepository {
     @Override
     public List<Task> findByStationAndStatus(Station station, TaskStatus status) {
         return jpaRepository.findByStationAndStatus(station, status).stream()
+            .map(mapper::toDomain)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Task> findByStationsAndStatus(Set<Station> stations, TaskStatus status) {
+        if (status == null) {
+            return stations.stream()
+                .flatMap(s -> jpaRepository.findByStation(s).stream())
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+        }
+        return stations.stream()
+            .flatMap(s -> jpaRepository.findByStationAndStatus(s, status).stream())
             .map(mapper::toDomain)
             .collect(Collectors.toList());
     }

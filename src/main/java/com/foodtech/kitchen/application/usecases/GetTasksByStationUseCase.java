@@ -7,6 +7,7 @@ import com.foodtech.kitchen.domain.model.Task;
 import com.foodtech.kitchen.domain.model.TaskStatus;
 
 import java.util.List;
+import java.util.Set;
 
 public class GetTasksByStationUseCase implements GetTasksByStationPort {
 
@@ -17,11 +18,7 @@ public class GetTasksByStationUseCase implements GetTasksByStationPort {
     }
 
     @Override
-    public List<Task> execute(Station station, TaskStatus status) {
-        if (status != null) {
-            return taskRepository.findByStationAndStatus(station, status);
-        }
-
-        return taskRepository.findByStation(station);
+    public List<Task> execute(Set<Station> stations, TaskStatus status) {
+        return taskRepository.findByStationsAndStatus(stations, status);
     }
 }

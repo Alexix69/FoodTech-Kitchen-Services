@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -29,7 +30,7 @@ public class TaskController {
     public ResponseEntity<List<TaskResponse>> getTasksByStation(
             @PathVariable Station station,
             @RequestParam(required = false) TaskStatus status) {
-        List<Task> tasks = getTasksByStationPort.execute(station, status);
+        List<Task> tasks = getTasksByStationPort.execute(Set.of(station), status);
         List<TaskResponse> response = TaskMapper.toResponseList(tasks);
         return ResponseEntity.ok(response);
     }

@@ -6,6 +6,7 @@ import com.foodtech.kitchen.domain.model.TaskStatus;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface TaskRepository {
     void saveAll(List<Task> tasks);
@@ -13,6 +14,7 @@ public interface TaskRepository {
     Optional<Task> findById(Long id);
     List<Task> findByStation(Station station);
     List<Task> findByStationAndStatus(Station station, TaskStatus status);
+    List<Task> findByStationsAndStatus(Set<Station> stations, TaskStatus status);
     List<Task> findByOrderId(Long orderId);
     long countByOrderId(Long orderId);
     long countByOrderIdAndStatus(Long orderId, TaskStatus status);
