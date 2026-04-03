@@ -2,6 +2,7 @@ package com.foodtech.kitchen.infrastructure.persistence.adapters;
 
 import com.foodtech.kitchen.application.ports.out.UserRepository;
 import com.foodtech.kitchen.domain.model.User;
+import com.foodtech.kitchen.domain.model.UserRole;
 import com.foodtech.kitchen.domain.model.UserStatus;
 import com.foodtech.kitchen.infrastructure.persistence.jpa.UserJpaRepository;
 import com.foodtech.kitchen.infrastructure.persistence.jpa.entities.UserEntity;
@@ -62,6 +63,7 @@ public class UserRepositoryAdapter implements UserRepository {
         entity.setEmail(user.getEmail());
         entity.setPasswordHash(user.getPasswordHash());
         entity.setStatus(user.getStatus().name());
+        entity.setRole(user.getRole());
         entity.setCreatedAt(user.getCreatedAt());
         entity.setLastLoginAt(user.getLastLoginAt());
         return entity;
@@ -74,6 +76,7 @@ public class UserRepositoryAdapter implements UserRepository {
                 entity.getEmail(),
                 entity.getPasswordHash(),
                 UserStatus.valueOf(entity.getStatus()),
+                entity.getRole(),
                 entity.getCreatedAt(),
                 entity.getLastLoginAt()
         );

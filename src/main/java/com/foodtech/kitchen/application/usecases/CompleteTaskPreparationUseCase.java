@@ -1,9 +1,12 @@
 package com.foodtech.kitchen.application.usecases;
 
+import com.foodtech.kitchen.application.exceptions.AccessDeniedException;
+import com.foodtech.kitchen.application.exceptions.TaskNotFoundException;
 import com.foodtech.kitchen.application.ports.in.CompleteTaskPreparationPort;
 import com.foodtech.kitchen.application.ports.out.TaskRepository;
 import com.foodtech.kitchen.domain.model.Task;
 import com.foodtech.kitchen.domain.model.UserRole;
+import com.foodtech.kitchen.domain.services.RoleStationMapper;
 
 public class CompleteTaskPreparationUseCase implements CompleteTaskPreparationPort {
 
@@ -15,6 +18,17 @@ public class CompleteTaskPreparationUseCase implements CompleteTaskPreparationPo
 
     @Override
     public Task execute(Long taskId, UserRole callerRole) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException(taskId));
+
+        if (!RoleStationMapper.stationsFor(callerRole).contains(task.getStation())) {
+            throw new AccessDeniedException(
+                "Role " + callerRole + " cannot complete tasks at station " + task.getStation()
+            );
+        }
+
+        task.complete();
+
+        return taskRepository.save(task);
     }
 }

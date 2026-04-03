@@ -1,5 +1,6 @@
 package com.foodtech.kitchen.application.usecases;
 
+import com.foodtech.kitchen.application.ports.in.RegisterUserPort;
 import com.foodtech.kitchen.application.ports.out.PasswordHasher;
 import com.foodtech.kitchen.application.ports.out.UserRepository;
 import com.foodtech.kitchen.application.exceptions.DuplicateEmailException;
@@ -8,7 +9,7 @@ import com.foodtech.kitchen.domain.model.User;
 import com.foodtech.kitchen.domain.model.UserRole;
 import com.foodtech.kitchen.domain.model.UserStatus;
 
-public class RegisterUserUseCase {
+public class RegisterUserUseCase implements RegisterUserPort {
     private final UserRepository userRepository;
     private final PasswordHasher passwordHasher;
 
@@ -17,7 +18,26 @@ public class RegisterUserUseCase {
         this.passwordHasher = passwordHasher;
     }
 
+    @Override
+    public void execute(String username, String email, String password, UserRole role) {
+        if (role == null) {
+            throw new IllegalArgumentException("Role must not be null");
+        }
+        registerUser(username, email, password, role);
+    }
+
+    public User registerWithRole(String username, String email, String rawPassword, UserRole role) {
+        if (role == null) {
+            throw new IllegalArgumentException("Role must not be null");
+        }
+        return registerUser(username, email, rawPassword, role);
+    }
+
     public User execute(String username, String email, String rawPassword) {
+        return registerUser(username, email, rawPassword, null);
+    }
+
+    private User registerUser(String username, String email, String rawPassword, UserRole role) {
         validateEmail(email);
         validatePassword(rawPassword);
         if (userRepository.existsByEmail(email)) {
@@ -27,12 +47,10 @@ public class RegisterUserUseCase {
             throw new DuplicateUsernameException("Username already registered");
         }
         String passwordHash = passwordHasher.hash(rawPassword);
-        User user = new User(username, email, passwordHash, UserStatus.ACTIVE);
+        User user = role != null
+            ? new User(username, email, passwordHash, UserStatus.ACTIVE, role)
+            : new User(username, email, passwordHash, UserStatus.ACTIVE);
         return userRepository.save(user);
-    }
-
-    public User execute(String username, String email, String rawPassword, UserRole role) {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     private void validateEmail(String email) {

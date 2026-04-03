@@ -45,16 +45,10 @@ class SecurityIntegrationTest {
                 .andExpect(status().isUnauthorized());
     }
 
-        @Test
-        @DisplayName("RED: Protected endpoint with valid token returns 200")
-        void protectedEndpoint_withValidToken_returns200() throws Exception {
-        String registerBody = "{\"username\":\"auth-user\",\"email\":\"auth-user@example.com\",\"password\":\"abc123\"}";
-        mockMvc.perform(post("/api/auth/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(registerBody))
-            .andExpect(status().isCreated());
-
-        String loginBody = "{\"identifier\":\"auth-user@example.com\",\"password\":\"abc123\"}";
+    @Test
+    @DisplayName("RED: Protected endpoint with valid token returns 200")
+    void protectedEndpoint_withValidToken_returns200() throws Exception {
+        String loginBody = "{\"identifier\":\"jdoe@example.com\",\"password\":\"abc123\"}";
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
             .content(loginBody))
@@ -67,7 +61,7 @@ class SecurityIntegrationTest {
         mockMvc.perform(get("/api/tasks/station/BAR")
             .header("Authorization", "Bearer " + token))
             .andExpect(status().isOk());
-        }
+    }
 
     @Test
     @DisplayName("RED: Protected endpoint with expired token returns 401")

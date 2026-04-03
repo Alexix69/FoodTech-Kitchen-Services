@@ -119,7 +119,7 @@ class RegisterUserUseCaseTest {
         when(passwordHasher.hash(password)).thenReturn("hashed");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        User result = registerUserUseCase.execute(username, email, password, role);
+        User result = registerUserUseCase.registerWithRole(username, email, password, role);
 
         assertNotNull(result);
         assertTrue(result.hasRole());
@@ -133,7 +133,7 @@ class RegisterUserUseCaseTest {
         String password = "abc123";
 
         assertThrows(IllegalArgumentException.class,
-            () -> registerUserUseCase.execute(username, email, password, null));
+            () -> registerUserUseCase.registerWithRole(username, email, password, null));
 
         verify(userRepository, never()).save(any(User.class));
     }
