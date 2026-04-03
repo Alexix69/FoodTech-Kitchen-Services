@@ -1,9 +1,9 @@
 package com.foodtech.kitchen.infrastructure.rest.exception;
 
-import com.foodtech.kitchen.application.exepcions.DuplicateEmailException;
-import com.foodtech.kitchen.application.exepcions.DuplicateUsernameException;
-import com.foodtech.kitchen.application.exepcions.OrderNotFoundException;
-import com.foodtech.kitchen.application.exepcions.TaskNotFoundException;
+import com.foodtech.kitchen.application.exceptions.DuplicateEmailException;
+import com.foodtech.kitchen.application.exceptions.DuplicateUsernameException;
+import com.foodtech.kitchen.application.exceptions.OrderNotFoundException;
+import com.foodtech.kitchen.application.exceptions.TaskNotFoundException;
 import com.foodtech.kitchen.infrastructure.rest.dto.ErrorResponse;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

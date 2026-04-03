@@ -12,17 +12,14 @@ public class User {
     private final LocalDateTime createdAt;
     private final LocalDateTime lastLoginAt;
 
-    /** Convenience constructor — no role assigned (pre-RBAC users). */
     public User(String username, String email, String passwordHash, UserStatus status) {
         this(null, username, email, passwordHash, status, null, LocalDateTime.now(), null);
     }
 
-    /** Convenience constructor — role assigned at registration time. */
     public User(String username, String email, String passwordHash, UserStatus status, UserRole role) {
         this(null, username, email, passwordHash, status, role, LocalDateTime.now(), null);
     }
 
-    /** Full-arg reconstruction constructor used by persistence adapters. */
     public User(Long id,
                 String username,
                 String email,
@@ -33,7 +30,6 @@ public class User {
         this(id, username, email, passwordHash, status, null, createdAt, lastLoginAt);
     }
 
-    /** Full-arg reconstruction constructor including role — used by persistence adapters. */
     public User(Long id,
                 String username,
                 String email,
@@ -76,11 +72,6 @@ public class User {
         return role;
     }
 
-    /**
-     * Returns {@code true} if this user has been assigned a role.
-     * Pre-existing users created before the RBAC feature was introduced may
-     * have a {@code null} role; this method provides a safe null-check.
-     */
     public boolean hasRole() {
         return role != null;
     }

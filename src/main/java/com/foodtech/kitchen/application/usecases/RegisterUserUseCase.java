@@ -2,8 +2,8 @@ package com.foodtech.kitchen.application.usecases;
 
 import com.foodtech.kitchen.application.ports.out.PasswordHasher;
 import com.foodtech.kitchen.application.ports.out.UserRepository;
-import com.foodtech.kitchen.application.exepcions.DuplicateEmailException;
-import com.foodtech.kitchen.application.exepcions.DuplicateUsernameException;
+import com.foodtech.kitchen.application.exceptions.DuplicateEmailException;
+import com.foodtech.kitchen.application.exceptions.DuplicateUsernameException;
 import com.foodtech.kitchen.domain.model.User;
 import com.foodtech.kitchen.domain.model.UserStatus;
 

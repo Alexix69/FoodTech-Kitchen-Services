@@ -1,6 +1,6 @@
 package com.foodtech.kitchen.application.usecases;
 
-import com.foodtech.kitchen.application.exepcions.OrderNotFoundException;
+import com.foodtech.kitchen.application.exceptions.OrderNotFoundException;
 import com.foodtech.kitchen.application.ports.in.DeleteOrderPort;
 import com.foodtech.kitchen.application.ports.out.OrderRepository;
 

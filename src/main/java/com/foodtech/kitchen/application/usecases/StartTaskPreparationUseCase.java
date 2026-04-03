@@ -1,7 +1,7 @@
 package com.foodtech.kitchen.application.usecases;
 
-import com.foodtech.kitchen.application.exepcions.OrderNotFoundException;
-import com.foodtech.kitchen.application.exepcions.TaskNotFoundException;
+import com.foodtech.kitchen.application.exceptions.OrderNotFoundException;
+import com.foodtech.kitchen.application.exceptions.TaskNotFoundException;
 import com.foodtech.kitchen.application.ports.in.StartTaskPreparationPort;
 import com.foodtech.kitchen.application.ports.out.OrderRepository;
 import com.foodtech.kitchen.application.ports.out.TaskRepository;

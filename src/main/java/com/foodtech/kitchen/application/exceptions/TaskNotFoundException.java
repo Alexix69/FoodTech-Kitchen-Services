@@ -1,4 +1,4 @@
-package com.foodtech.kitchen.application.exepcions;
+package com.foodtech.kitchen.application.exceptions;
 
 public class TaskNotFoundException extends RuntimeException{
     public TaskNotFoundException(Long taskId) {

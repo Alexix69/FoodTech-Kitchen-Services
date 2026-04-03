@@ -1,11 +1,5 @@
-package com.foodtech.kitchen.application.exepcions;
+package com.foodtech.kitchen.application.exceptions;
 
-/**
- * Thrown when a user attempts to authenticate but has no role assigned.
- * This occurs for users created before the RBAC feature was introduced.
- *
- * <p>Maps to HTTP 403 with body {@code { "error": "ROLE_NOT_ASSIGNED", "userId": <id> }}.
- */
 public class RoleNotAssignedException extends RuntimeException {
 
     private final Long userId;
