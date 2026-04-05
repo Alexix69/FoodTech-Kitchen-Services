@@ -1,5 +1,6 @@
 package com.foodtech.kitchen.application.usecases;
 
+import com.foodtech.kitchen.application.exceptions.AccessDeniedException;
 import com.foodtech.kitchen.application.exceptions.TaskNotFoundException;
 import com.foodtech.kitchen.application.ports.out.OrderRepository;
 import com.foodtech.kitchen.application.ports.out.TaskRepository;
@@ -126,7 +127,7 @@ class StartTaskPreparationUseCaseTest {
         when(taskRepository.findById(taskId)).thenReturn(Optional.of(pendingTask));
 
         assertThrows(
-            com.foodtech.kitchen.application.exceptions.AccessDeniedException.class,
+            AccessDeniedException.class,
             () -> useCase.execute(taskId, UserRole.BARTENDER)
         );
 

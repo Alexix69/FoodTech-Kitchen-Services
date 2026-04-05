@@ -1,6 +1,7 @@
 package com.foodtech.kitchen.application.usecases;
 
 import com.foodtech.kitchen.application.exceptions.AccessDeniedException;
+import com.foodtech.kitchen.application.exceptions.InvalidTaskTransitionException;
 import com.foodtech.kitchen.application.exceptions.TaskNotFoundException;
 import com.foodtech.kitchen.application.ports.out.TaskRepository;
 import com.foodtech.kitchen.domain.model.Product;
@@ -73,7 +74,7 @@ class CompleteTaskPreparationUseCaseTest {
     }
 
     @Test
-    void execute_whenTaskIsInPendingState_throwsIllegalStateException() {
+    void execute_whenTaskIsInPendingState_throwsInvalidTaskTransitionException() {
         Long taskId = 3L;
         Product product = new Product("Burger", ProductType.HOT_DISH);
         Task task = Task.reconstruct(
@@ -83,7 +84,7 @@ class CompleteTaskPreparationUseCaseTest {
 
         when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
 
-        assertThrows(IllegalStateException.class,
+        assertThrows(InvalidTaskTransitionException.class,
             () -> useCase.execute(taskId, UserRole.COCINERO));
 
         verify(taskRepository, never()).save(any(Task.class));

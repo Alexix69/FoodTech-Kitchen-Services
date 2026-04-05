@@ -131,4 +131,35 @@ class OrderControllerIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").exists());
     }
+
+    @Test
+    @DisplayName("BE5-04 (1): POST /api/orders as COCINERO returns 403")
+    void cocinero_postOrder_returns403() throws Exception {
+        String cocineroToken = tokenGenerator.generateToken("cocinero-order-test", UserRole.COCINERO);
+        Map<String, Object> request = Map.of(
+            "tableNumber", "Z1",
+            "products", List.of(Map.of("name", "Pizza", "type", "HOT_DISH"))
+        );
+
+        mockMvc.perform(post("/api/orders")
+                .header("Authorization", "Bearer " + cocineroToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("BE5-04 (2): POST /api/orders as MESERO returns 201")
+    void mesero_postOrder_returns201() throws Exception {
+        Map<String, Object> request = Map.of(
+            "tableNumber", "Z2",
+            "products", List.of(Map.of("name", "Coca Cola", "type", "DRINK"))
+        );
+
+        mockMvc.perform(post("/api/orders")
+                .with(auth())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+    }
 }

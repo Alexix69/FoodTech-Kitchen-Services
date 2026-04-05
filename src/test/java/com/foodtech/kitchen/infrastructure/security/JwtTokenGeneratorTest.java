@@ -63,4 +63,61 @@ class JwtTokenGeneratorTest {
         assertThrows(IllegalArgumentException.class,
                 () -> new JwtTokenGenerator(secret, -1, clock));
     }
+
+    @Test
+    void generateToken_withMeseroRole_embedsRoleClaimAsMesero() {
+        String secret = "test-secret-should-be-long-enough-for-hs256-123456";
+        Instant fixedInstant = Instant.parse("2025-01-01T00:00:00Z");
+        Clock clock = Clock.fixed(fixedInstant, ZoneOffset.UTC);
+        JwtTokenGenerator generator = new JwtTokenGenerator(secret, 3600L, clock);
+
+        String token = generator.generateToken("alice", UserRole.MESERO);
+
+        Claims claims = Jwts.parserBuilder()
+            .setClock(() -> Date.from(fixedInstant))
+            .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+
+        assertEquals("MESERO", claims.get("role", String.class));
+    }
+
+    @Test
+    void generateToken_withCocineroRole_embedsRoleClaimAsCocinero() {
+        String secret = "test-secret-should-be-long-enough-for-hs256-123456";
+        Instant fixedInstant = Instant.parse("2025-01-01T00:00:00Z");
+        Clock clock = Clock.fixed(fixedInstant, ZoneOffset.UTC);
+        JwtTokenGenerator generator = new JwtTokenGenerator(secret, 3600L, clock);
+
+        String token = generator.generateToken("bob", UserRole.COCINERO);
+
+        Claims claims = Jwts.parserBuilder()
+            .setClock(() -> Date.from(fixedInstant))
+            .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+
+        assertEquals("COCINERO", claims.get("role", String.class));
+    }
+
+    @Test
+    void generateToken_withBartenderRole_embedsRoleClaimAsBartender() {
+        String secret = "test-secret-should-be-long-enough-for-hs256-123456";
+        Instant fixedInstant = Instant.parse("2025-01-01T00:00:00Z");
+        Clock clock = Clock.fixed(fixedInstant, ZoneOffset.UTC);
+        JwtTokenGenerator generator = new JwtTokenGenerator(secret, 3600L, clock);
+
+        String token = generator.generateToken("carol", UserRole.BARTENDER);
+
+        Claims claims = Jwts.parserBuilder()
+            .setClock(() -> Date.from(fixedInstant))
+            .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+
+        assertEquals("BARTENDER", claims.get("role", String.class));
+    }
 }

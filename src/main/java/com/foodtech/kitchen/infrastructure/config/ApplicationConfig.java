@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.foodtech.kitchen.application.ports.in.*;
 import com.foodtech.kitchen.application.ports.out.CommandExecutor;
 import com.foodtech.kitchen.application.ports.out.OrderRepository;
+import com.foodtech.kitchen.application.ports.out.OutboxEventRepository;
 import com.foodtech.kitchen.application.ports.out.PasswordHasher;
 import com.foodtech.kitchen.application.ports.out.PayloadSerializer;
 import com.foodtech.kitchen.application.ports.out.TaskRepository;
@@ -20,6 +21,7 @@ import com.foodtech.kitchen.infrastructure.security.JwtTokenValidator;
 import com.foodtech.kitchen.infrastructure.security.JwtTokenGenerator;
 import com.foodtech.kitchen.infrastructure.serialization.JacksonPayloadSerializer;
 import com.foodtech.kitchen.infrastructure.transactional.TransactionalOrderCompletionService;
+import com.foodtech.kitchen.infrastructure.transactional.TransactionalCompleteTaskPreparationPort;
 import com.foodtech.kitchen.infrastructure.transactional.TransactionalDeleteOrderPort;
 import com.foodtech.kitchen.infrastructure.transactional.TransactionalProcessOrderPort;
 import com.foodtech.kitchen.infrastructure.transactional.TransactionalRequestOrderInvoicePort;
@@ -223,7 +225,7 @@ public class ApplicationConfig {
     @Bean
     public RequestOrderInvoiceUseCase requestOrderInvoiceUseCase(
             OrderRepository orderRepository,
-            com.foodtech.kitchen.application.ports.out.OutboxEventRepository outboxEventRepository,
+            OutboxEventRepository outboxEventRepository,
             InvoicePayloadBuilder payloadBuilder
     ) {
         return new RequestOrderInvoiceUseCase(orderRepository, outboxEventRepository, payloadBuilder);
@@ -243,12 +245,47 @@ public class ApplicationConfig {
     }
 
     @Bean
+    public RegisterUserPort registerUserPort(RegisterUserUseCase registerUserUseCase) {
+        return registerUserUseCase;
+    }
+
+    @Bean
     public AuthenticateUserUseCase authenticateUserUseCase(
             UserRepository userRepository,
             TokenGenerator tokenGenerator,
             PasswordHasher passwordHasher
     ) {
         return new AuthenticateUserUseCase(userRepository, tokenGenerator, passwordHasher);
+    }
+
+    @Bean
+    public AuthenticateUserPort authenticateUserPort(AuthenticateUserUseCase authenticateUserUseCase) {
+        return authenticateUserUseCase;
+    }
+
+    @Bean
+    public CompleteTaskPreparationUseCase completeTaskPreparationUseCase(TaskRepository taskRepository) {
+        return new CompleteTaskPreparationUseCase(taskRepository);
+    }
+
+    @Bean
+    public CompleteTaskPreparationPort completeTaskPreparationPort(
+            CompleteTaskPreparationUseCase completeTaskPreparationUseCase
+    ) {
+        return new TransactionalCompleteTaskPreparationPort(completeTaskPreparationUseCase);
+    }
+
+    @Bean
+    public AssignUserRoleUseCase assignUserRoleUseCase(
+            UserRepository userRepository,
+            TokenGenerator tokenGenerator
+    ) {
+        return new AssignUserRoleUseCase(userRepository, tokenGenerator);
+    }
+
+    @Bean
+    public AssignUserRolePort assignUserRolePort(AssignUserRoleUseCase assignUserRoleUseCase) {
+        return assignUserRoleUseCase;
     }
 
     @Bean

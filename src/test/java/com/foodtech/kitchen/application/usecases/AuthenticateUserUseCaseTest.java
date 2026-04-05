@@ -1,5 +1,6 @@
 package com.foodtech.kitchen.application.usecases;
 
+import com.foodtech.kitchen.application.exceptions.RoleNotAssignedException;
 import com.foodtech.kitchen.application.model.AuthResponse;
 import com.foodtech.kitchen.application.ports.out.PasswordHasher;
 import com.foodtech.kitchen.application.ports.out.TokenGenerator;
@@ -169,8 +170,8 @@ class AuthenticateUserUseCaseTest {
         when(passwordHasher.matches(rawPassword, storedHash))
             .thenReturn(true);
 
-        com.foodtech.kitchen.application.exceptions.RoleNotAssignedException ex =
-            assertThrows(com.foodtech.kitchen.application.exceptions.RoleNotAssignedException.class,
+        RoleNotAssignedException ex =
+            assertThrows(RoleNotAssignedException.class,
                 () -> authenticateUserUseCase.execute(identifier, rawPassword));
 
         assertEquals(5L, ex.getUserId());

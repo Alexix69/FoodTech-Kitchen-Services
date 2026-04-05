@@ -1,6 +1,7 @@
 package com.foodtech.kitchen.application.usecases;
 
 import com.foodtech.kitchen.application.exceptions.AccessDeniedException;
+import com.foodtech.kitchen.application.exceptions.InvalidTaskTransitionException;
 import com.foodtech.kitchen.application.exceptions.TaskNotFoundException;
 import com.foodtech.kitchen.application.ports.in.CompleteTaskPreparationPort;
 import com.foodtech.kitchen.application.ports.out.TaskRepository;
@@ -27,7 +28,11 @@ public class CompleteTaskPreparationUseCase implements CompleteTaskPreparationPo
             );
         }
 
-        task.complete();
+        try {
+            task.complete();
+        } catch (IllegalStateException e) {
+            throw new InvalidTaskTransitionException(taskId, task.getStatus().name());
+        }
 
         return taskRepository.save(task);
     }

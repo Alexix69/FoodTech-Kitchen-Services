@@ -6,6 +6,7 @@ import com.foodtech.kitchen.application.ports.out.TaskRepository;
 import com.foodtech.kitchen.domain.model.UserRole;
 import com.foodtech.kitchen.domain.model.Station;
 import com.foodtech.kitchen.domain.model.Task;
+import com.foodtech.kitchen.domain.model.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -45,10 +46,14 @@ class TaskControllerIntegrationTest {
     private TokenGenerator tokenGenerator;
 
     private String authHeaderValue;
+    private String meseroAuthHeaderValue;
+    private String bartenderAuthHeaderValue;
 
     @BeforeEach
     void setUp() throws Exception {
         authHeaderValue = "Bearer " + tokenGenerator.generateToken("test-user", UserRole.COCINERO);
+        meseroAuthHeaderValue = "Bearer " + tokenGenerator.generateToken("mesero-task-user", UserRole.MESERO);
+        bartenderAuthHeaderValue = "Bearer " + tokenGenerator.generateToken("bartender-task-user", UserRole.BARTENDER);
 
         // Given - Preparar datos: 3 tareas (2 BAR, 1 HOT_KITCHEN)
         
@@ -60,7 +65,7 @@ class TaskControllerIntegrationTest {
             )
         );
         mockMvc.perform(post("/api/orders")
-            .with(auth())
+            .with(meseroAuth())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(orderBar1)));
 
@@ -72,7 +77,7 @@ class TaskControllerIntegrationTest {
             )
         );
         mockMvc.perform(post("/api/orders")
-            .with(auth())
+            .with(meseroAuth())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(orderBar2)));
 
@@ -84,7 +89,7 @@ class TaskControllerIntegrationTest {
             )
         );
         mockMvc.perform(post("/api/orders")
-            .with(auth())
+            .with(meseroAuth())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(orderHotKitchen)));
     }
@@ -96,15 +101,29 @@ class TaskControllerIntegrationTest {
         };
     }
 
+    private RequestPostProcessor meseroAuth() {
+        return request -> {
+            request.addHeader("Authorization", meseroAuthHeaderValue);
+            return request;
+        };
+    }
+
+    private RequestPostProcessor bartenderAuth() {
+        return request -> {
+            request.addHeader("Authorization", bartenderAuthHeaderValue);
+            return request;
+        };
+    }
+
     @Test
     @DisplayName("Scenario 1: Should return only tasks for specified station")
     void shouldReturnOnlyTasksForSpecifiedStation() throws Exception {
         // When - el encargado de barra consulta sus tareas
         // Then - el sistema muestra únicamente tareas de barra (verifica filtrado)
-        mockMvc.perform(get("/api/tasks/station/BAR").with(auth()))
+        mockMvc.perform(get("/api/tasks/station/BAR").with(bartenderAuth()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$[0]").exists())  // Al menos una tarea
+            .andExpect(jsonPath("$[0]").exists())
             .andExpect(jsonPath("$[0].station").value("BAR"))
             .andExpect(jsonPath("$[0].tableNumber").exists())
             .andExpect(jsonPath("$[0].products").isArray())
@@ -129,7 +148,7 @@ class TaskControllerIntegrationTest {
         // Given - tareas ya creadas en setUp
         // When - el encargado consulta las tareas
         // Then - el sistema muestra información completa incluyendo createdAt
-        mockMvc.perform(get("/api/tasks/station/BAR").with(auth()))
+        mockMvc.perform(get("/api/tasks/station/BAR").with(bartenderAuth()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].tableNumber").exists())
             .andExpect(jsonPath("$[0].station").value("BAR"))
@@ -155,11 +174,9 @@ class TaskControllerIntegrationTest {
     @DisplayName("HU-003 Scenario 1: Should start task preparation and update status")
     @org.springframework.transaction.annotation.Transactional
     void shouldStartTaskPreparation() throws Exception {
-        // Given - existe una tarea pendiente con ID
-        List<Task> allTasks = taskRepository.findAll();
-        Long taskId = allTasks.get(0).getId();
+        List<Task> hotKitchenTasks = taskRepository.findByStation(Station.HOT_KITCHEN);
+        Long taskId = hotKitchenTasks.get(0).getId();
 
-        // When - el cocinero inicia la preparación de la tarea
         mockMvc.perform(patch("/api/tasks/" + taskId + "/start").with(auth()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(taskId))
@@ -189,7 +206,7 @@ class TaskControllerIntegrationTest {
         taskRepository.save(task2);
 
         // When - se consulta el historial de tareas completadas de barra
-        mockMvc.perform(get("/api/tasks/station/BAR?status=COMPLETED").with(auth()))
+        mockMvc.perform(get("/api/tasks/station/BAR?status=COMPLETED").with(bartenderAuth()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(2)))
             .andExpect(jsonPath("$[0].status").value("COMPLETED"))
@@ -216,7 +233,7 @@ class TaskControllerIntegrationTest {
         ));
 
         mockMvc.perform(post("/api/orders")
-            .with(auth())
+            .with(meseroAuth())
             .contentType(MediaType.APPLICATION_JSON)
             .content(orderRequest))
             .andExpect(status().isCreated());
@@ -274,5 +291,42 @@ class TaskControllerIntegrationTest {
         mockMvc.perform(get("/api/orders/" + orderId + "/status").with(auth()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.status").value("COMPLETED"));
+    }
+
+    @Test
+    @DisplayName("BE5-03 (1): COCINERO PATCH /tasks/{id}/complete on HOT_KITCHEN IN_PREPARATION returns 200")
+    @org.springframework.transaction.annotation.Transactional
+    void cocinero_completesHotKitchenTask_returns200() throws Exception {
+        List<Task> hotKitchenPending = taskRepository.findByStationAndStatus(Station.HOT_KITCHEN, TaskStatus.PENDING);
+        Long taskId = hotKitchenPending.get(0).getId();
+
+        mockMvc.perform(patch("/api/tasks/" + taskId + "/start").with(auth()))
+            .andExpect(status().isOk());
+
+        mockMvc.perform(patch("/api/tasks/" + taskId + "/complete").with(auth()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status").value("COMPLETED"));
+    }
+
+    @Test
+    @DisplayName("BE5-03 (2): BARTENDER PATCH /tasks/{id}/complete on wrong station returns 403")
+    @org.springframework.transaction.annotation.Transactional
+    void bartender_completesWrongStationTask_returns403() throws Exception {
+        List<Task> hotKitchenPending = taskRepository.findByStationAndStatus(Station.HOT_KITCHEN, TaskStatus.PENDING);
+        Long taskId = hotKitchenPending.get(0).getId();
+
+        mockMvc.perform(patch("/api/tasks/" + taskId + "/complete").with(bartenderAuth()))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("BE5-03 (3): complete PENDING task returns 409")
+    @org.springframework.transaction.annotation.Transactional
+    void complete_pendingTask_returns409() throws Exception {
+        List<Task> hotKitchenPending = taskRepository.findByStationAndStatus(Station.HOT_KITCHEN, TaskStatus.PENDING);
+        Long taskId = hotKitchenPending.get(0).getId();
+
+        mockMvc.perform(patch("/api/tasks/" + taskId + "/complete").with(auth()))
+            .andExpect(status().isConflict());
     }
 }

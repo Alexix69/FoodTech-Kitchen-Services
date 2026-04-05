@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,9 @@ public interface TaskJpaRepository extends JpaRepository<TaskEntity, Long> {
     List<TaskEntity> findByOrderId(Long orderId);
     long countByOrderId(Long orderId);
     long countByOrderIdAndStatus(Long orderId, TaskStatus status);
+
+    List<TaskEntity> findByStationIn(Collection<Station> stations);
+    List<TaskEntity> findByStationInAndStatusOrderByCreatedAtAsc(Collection<Station> stations, TaskStatus status);
 
     @Query("SELECT t FROM TaskEntity t LEFT JOIN FETCH t.products WHERE t.id = :id")
     Optional<TaskEntity> findByIdWithProducts(@Param("id") Long id);

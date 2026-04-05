@@ -39,6 +39,7 @@ public class JwtTokenGenerator implements TokenGenerator {
                 .setSubject(username)
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(expiration))
+                .claim("role", role.name())
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
                 .compact();
     }
