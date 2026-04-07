@@ -77,9 +77,9 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
             ex.getMessage(),
             "Invalid state transition",
-            HttpStatus.BAD_REQUEST.value()
+            HttpStatus.CONFLICT.value()
         );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)

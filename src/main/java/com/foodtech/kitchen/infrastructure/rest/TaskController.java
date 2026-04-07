@@ -57,7 +57,8 @@ public class TaskController {
 
     @PatchMapping("/{id}/start")
     public ResponseEntity<TaskResponse> startTaskPreparation(@PathVariable Long id) {
-        Task task = startTaskPreparationPort.execute(id, null);
+        UserRole callerRole = extractCallerRole();
+        Task task = startTaskPreparationPort.execute(id, callerRole);
         return ResponseEntity.ok(TaskMapper.toResponse(task));
     }
 
