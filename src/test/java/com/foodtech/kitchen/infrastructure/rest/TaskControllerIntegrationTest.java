@@ -219,7 +219,7 @@ class TaskControllerIntegrationTest {
         List<Task> allTasks = taskRepository.findAll();
         Long orderId = allTasks.get(allTasks.size() - 1).getOrderId();
         List<Task> orderTasks = taskRepository.findByOrderId(orderId);
-        
+        orderTasks.sort(java.util.Comparator.comparing(t -> t.getStation().name()));
         assertEquals(3, orderTasks.size());
         
         mockMvc.perform(get("/api/orders/" + orderId + "/status").with(auth()))
@@ -227,7 +227,7 @@ class TaskControllerIntegrationTest {
             .andExpect(jsonPath("$.orderId").value(orderId.toString()))
             .andExpect(jsonPath("$.status").value("PENDING"));
 
-        mockMvc.perform(patch("/api/tasks/" + orderTasks.get(0).getId() + "/start").with(auth()))
+        mockMvc.perform(patch("/api/tasks/" + orderTasks.get(0).getId() + "/start").with(bartenderAuth()))
             .andExpect(status().isOk());
 
         mockMvc.perform(get("/api/orders/" + orderId + "/status").with(auth()))
