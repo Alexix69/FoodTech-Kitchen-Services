@@ -34,6 +34,15 @@ public class TaskRepositoryAdapter implements TaskRepository {
 
     @Override
     public Task save(Task task) {
+        if (task.getId() != null) {
+            TaskEntity existing = jpaRepository.findById(task.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Task not found: " + task.getId()));
+            existing.setStatus(task.getStatus());
+            existing.setStartedAt(task.getStartedAt());
+            existing.setCompletedAt(task.getCompletedAt());
+            TaskEntity saved = jpaRepository.save(existing);
+            return mapper.toDomain(saved);
+        }
         TaskEntity entity = mapper.toEntity(task);
         TaskEntity saved = jpaRepository.save(entity);
         return mapper.toDomain(saved);

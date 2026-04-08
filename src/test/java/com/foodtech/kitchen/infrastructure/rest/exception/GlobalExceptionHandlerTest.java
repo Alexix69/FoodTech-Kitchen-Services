@@ -103,17 +103,14 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void handleIllegalStateException_returnsBadRequest() {
-        // Arrange
         IllegalStateException ex = new IllegalStateException("bad state");
 
-        // Act
         ResponseEntity<ErrorResponse> response = handler.handleIllegalStateException(ex);
 
-        // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("Invalid state transition", response.getBody().message());
-        assertEquals(400, response.getBody().status());
+        assertEquals(409, response.getBody().status());
     }
 
     @Test
