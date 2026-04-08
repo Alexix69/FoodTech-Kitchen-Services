@@ -15,7 +15,6 @@ public class PrepareDrinkCommand implements Command {
 
     @Override
     public void execute() {
-        // FR-029: simulation removed — task state is now changed only through explicit user action
         System.out.println("[BAR] Drink command registered for " + products.size() + " product(s)");
     }
 }

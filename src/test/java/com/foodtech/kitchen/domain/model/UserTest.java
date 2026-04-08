@@ -6,9 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * BE1-03: User domain model — role field, hasRole(), immutability.
- */
 @Tag("unit")
 class UserTest {
 
@@ -43,10 +40,7 @@ class UserTest {
     @Test
     @DisplayName("User has no setRole method — role is immutable after construction")
     void user_hasNoSetRoleMethod() {
-        // If this compiles, there is no setRole(UserRole) method
-        // Verified structurally: attempting to call setRole would be a compile error
         User user = new User("juan", "juan@test.com", "hash", UserStatus.ACTIVE, UserRole.MESERO);
         assertEquals(UserRole.MESERO, user.getRole());
-        // No setter — role is final and set only at construction time
     }
 }

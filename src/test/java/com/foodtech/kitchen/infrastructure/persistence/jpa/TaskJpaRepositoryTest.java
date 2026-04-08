@@ -28,7 +28,6 @@ class TaskJpaRepositoryTest {
     @Test
     @DisplayName("Should save and find task")
     void shouldSaveAndFindTask() {
-        // Given
         TaskProductEntity p =
             TaskProductEntity.builder()
                 .name("Coca Cola").type(ProductType.DRINK).build();
@@ -40,11 +39,9 @@ class TaskJpaRepositoryTest {
             .products(List.of(p))
             .build();
 
-        // When
         TaskEntity saved = repository.save(task);
         TaskEntity found = repository.findById(saved.getId()).orElse(null);
 
-        // Then
         assertNotNull(found);
         assertEquals(Station.BAR, found.getStation());
         assertEquals("A1", found.getTableNumber());
@@ -53,7 +50,6 @@ class TaskJpaRepositoryTest {
     @Test
     @DisplayName("Should find tasks by station")
     void shouldFindTasksByStation() {
-        // Given
         TaskEntity barTask = TaskEntity.builder()
             .orderId(1L)
             .station(Station.BAR)
@@ -71,10 +67,8 @@ class TaskJpaRepositoryTest {
         repository.save(barTask);
         repository.save(kitchenTask);
 
-        // When
         List<TaskEntity> barTasks = repository.findByStation(Station.BAR);
 
-        // Then
         assertEquals(1, barTasks.size());
         assertEquals(Station.BAR, barTasks.get(0).getStation());
     }

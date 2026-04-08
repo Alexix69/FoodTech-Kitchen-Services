@@ -13,7 +13,6 @@ class TaskTest {
 
     @Test
     void shouldTransitionFromPendingToInPreparation() {
-        // Given
         Product product = new Product("Cerveza", ProductType.DRINK);
         Task task = new Task(
                 1L,
@@ -23,17 +22,14 @@ class TaskTest {
                 LocalDateTime.now()
         );
 
-        // When
         task.start();
 
-        // Then
         assertEquals(TaskStatus.IN_PREPARATION, task.getStatus());
         assertNotNull(task.getStartedAt());
     }
 
     @Test
     void shouldTransitionFromInPreparationToCompleted() {
-        // Given
         Product product = new Product("Cerveza", ProductType.DRINK);
         Task task = new Task(
                 1L,
@@ -44,17 +40,14 @@ class TaskTest {
         );
         task.start();
 
-        // When
         task.complete();
 
-        // Then
         assertEquals(TaskStatus.COMPLETED, task.getStatus());
         assertNotNull(task.getCompletedAt());
     }
 
     @Test
     void shouldNotCompleteTaskWhenNotInPreparation() {
-        // Given
         Product product = new Product("Cerveza", ProductType.DRINK);
         Task task = new Task(
                 1L,
@@ -63,9 +56,7 @@ class TaskTest {
                 List.of(product),
                 LocalDateTime.now()
         );
-        // Task is still PENDING, not started
 
-        // When & Then
         IllegalStateException exception = assertThrows(
             IllegalStateException.class,
             () -> task.complete()

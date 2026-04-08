@@ -51,7 +51,6 @@ class StartTaskPreparationUseCaseTest {
 
     @Test
     void shouldStartTaskAndDispatchCommand() {
-        // Given
         Long taskId = 1L;
         LocalDateTime now = LocalDateTime.of(2026, 2, 20, 12, 0);
         Product product = new Product("Cerveza", ProductType.DRINK);
@@ -89,10 +88,8 @@ class StartTaskPreparationUseCaseTest {
         Command command = mock(Command.class);
         when(commandFactory.createCommand(any(), any())).thenReturn(command);
 
-        // When
         Task result = useCase.execute(taskId, UserRole.BARTENDER);
 
-        // Then
         assertNotNull(result);
         assertEquals(TaskStatus.IN_PREPARATION, result.getStatus());
         assertNotNull(result.getStartedAt());
@@ -103,11 +100,9 @@ class StartTaskPreparationUseCaseTest {
 
     @Test
     void shouldThrowExceptionWhenTaskNotFound() {
-        // Given
         Long taskId = 99L;
         when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
 
-        // When / Then
         assertThrows(TaskNotFoundException.class, () -> useCase.execute(taskId, UserRole.COCINERO));
         verify(taskRepository).findById(taskId);
         verify(taskRepository, never()).save(any(Task.class));

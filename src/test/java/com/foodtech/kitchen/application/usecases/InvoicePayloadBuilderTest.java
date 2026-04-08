@@ -32,14 +32,11 @@ class InvoicePayloadBuilderTest {
 
     @Test
     void build_whenValidOrder_buildsPayloadAndSerializes() {
-        // Arrange
         Order order = Order.reconstruct(200L, "C3", sampleProducts(), OrderStatus.COMPLETED);
         when(payloadSerializer.serialize(org.mockito.Mockito.anyMap())).thenReturn("json");
 
-        // Act
         String result = builder.build(order, 2, 2);
 
-        // Assert
         assertEquals("json", result);
 
         ArgumentCaptor<Map<String, Object>> payloadCaptor = ArgumentCaptor.forClass(Map.class);

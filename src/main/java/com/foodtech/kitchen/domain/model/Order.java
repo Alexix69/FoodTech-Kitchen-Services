@@ -3,7 +3,6 @@ package com.foodtech.kitchen.domain.model;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Order {
 
     private final Long id;

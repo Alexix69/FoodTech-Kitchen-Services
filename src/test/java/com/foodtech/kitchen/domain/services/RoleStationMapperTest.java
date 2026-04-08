@@ -10,9 +10,6 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * BE1-02: RoleStationMapper must map each role to the correct set of stations.
- */
 @Tag("unit")
 class RoleStationMapperTest {
 

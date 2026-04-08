@@ -22,10 +22,8 @@ class TransactionalRequestOrderInvoicePortTest {
 
     @Test
     void execute_delegatesToUseCase() {
-        // Act
         port.execute(10L);
 
-        // Assert
         verify(delegate).execute(10L);
     }
 }

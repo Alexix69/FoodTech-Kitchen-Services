@@ -15,7 +15,6 @@ public class PrepareHotDishCommand implements Command {
 
     @Override
     public void execute() {
-        // FR-029: simulation removed — task state is now changed only through explicit user action
         System.out.println("[HOT_KITCHEN] Hot dish command registered for " + products.size() + " product(s)");
     }
 }

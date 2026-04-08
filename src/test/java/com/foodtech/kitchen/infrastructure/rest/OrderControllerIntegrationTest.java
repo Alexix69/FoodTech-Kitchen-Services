@@ -53,7 +53,6 @@ class OrderControllerIntegrationTest {
     @Test
     @DisplayName("Should create order and return 201 with task count")
     void shouldCreateOrderAndReturn201() throws Exception {
-        // Given
         Map<String, Object> request = Map.of(
             "tableNumber", "A1",
             "products", List.of(
@@ -61,7 +60,6 @@ class OrderControllerIntegrationTest {
             )
         );
 
-        // When & Then
         mockMvc.perform(post("/api/orders")
             .with(auth())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -75,7 +73,6 @@ class OrderControllerIntegrationTest {
     @Test
     @DisplayName("Should create order with mixed products")
     void shouldCreateOrderWithMixedProducts() throws Exception {
-        // Given
         Map<String, Object> request = Map.of(
             "tableNumber", "B2",
             "products", List.of(
@@ -84,7 +81,6 @@ class OrderControllerIntegrationTest {
             )
         );
 
-        // When & Then
         mockMvc.perform(post("/api/orders")
             .with(auth())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -97,13 +93,11 @@ class OrderControllerIntegrationTest {
     @Test
     @DisplayName("Should reject order without products")
     void shouldRejectOrderWithoutProducts() throws Exception {
-        // Given
         Map<String, Object> request = Map.of(
             "tableNumber", "C3",
             "products", List.of()
         );
 
-        // When & Then
         mockMvc.perform(post("/api/orders")
             .with(auth())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -115,7 +109,6 @@ class OrderControllerIntegrationTest {
     @Test
     @DisplayName("Should reject order without table number")
     void shouldRejectOrderWithoutTableNumber() throws Exception {
-        // Given
         Map<String, Object> request = Map.of(
             "tableNumber", "",
             "products", List.of(
@@ -123,7 +116,6 @@ class OrderControllerIntegrationTest {
             )
         );
 
-        // When & Then
         mockMvc.perform(post("/api/orders")
             .with(auth())
                 .contentType(MediaType.APPLICATION_JSON)

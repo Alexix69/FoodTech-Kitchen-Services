@@ -38,21 +38,17 @@ class TaskRepositoryAdapterTest {
     @Test
     @DisplayName("Should save tasks using JPA repository")
     void shouldSaveTasks() {
-        // Given
         Product product = new Product("Coca Cola", ProductType.DRINK);
         Task task = new Task(1L, Station.BAR, "A1", List.of(product), LocalDateTime.now());
 
-        // When
         adapter.saveAll(List.of(task));
 
-        // Then
         verify(jpaRepository, times(1)).saveAll(anyList());
     }
 
     @Test
     @DisplayName("Should find tasks by station")
     void shouldFindTasksByStation() {
-        // Given
         TaskProductEntity p =
             TaskProductEntity.builder()
                 .name("Coca Cola").type(ProductType.DRINK).build();
@@ -69,10 +65,8 @@ class TaskRepositoryAdapterTest {
         when(jpaRepository.findByStation(Station.BAR))
             .thenReturn(List.of(entity));
 
-        // When
         List<Task> tasks = adapter.findByStation(Station.BAR);
 
-        // Then
         assertEquals(1, tasks.size());
         assertEquals(Station.BAR, tasks.get(0).getStation());
         verify(jpaRepository, times(1)).findByStation(Station.BAR);
@@ -81,7 +75,6 @@ class TaskRepositoryAdapterTest {
     @Test
     @DisplayName("Should find all tasks")
     void shouldFindAllTasks() {
-        // Given
         TaskProductEntity p =
             TaskProductEntity.builder()
                 .name("Coca Cola").type(ProductType.DRINK).build();
@@ -97,10 +90,8 @@ class TaskRepositoryAdapterTest {
         
         when(jpaRepository.findAll()).thenReturn(List.of(entity));
 
-        // When
         List<Task> tasks = adapter.findAll();
 
-        // Then
         assertEquals(1, tasks.size());
         verify(jpaRepository, times(1)).findAll();
     }
@@ -108,7 +99,6 @@ class TaskRepositoryAdapterTest {
     @Test
     @DisplayName("Should find tasks by station and status")
     void shouldFindTasksByStationAndStatus() {
-        // Given
         TaskProductEntity p =
             TaskProductEntity.builder()
                 .name("Coca Cola").type(ProductType.DRINK).build();
@@ -128,10 +118,8 @@ class TaskRepositoryAdapterTest {
         when(jpaRepository.findByStationAndStatus(Station.BAR, TaskStatus.COMPLETED))
             .thenReturn(List.of(completedEntity));
 
-        // When
         List<Task> tasks = adapter.findByStationAndStatus(Station.BAR, TaskStatus.COMPLETED);
 
-        // Then
         assertEquals(1, tasks.size());
         assertEquals(Station.BAR, tasks.get(0).getStation());
         assertEquals(TaskStatus.COMPLETED, tasks.get(0).getStatus());

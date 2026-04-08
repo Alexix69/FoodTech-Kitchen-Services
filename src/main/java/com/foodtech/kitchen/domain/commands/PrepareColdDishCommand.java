@@ -15,7 +15,6 @@ public class PrepareColdDishCommand implements Command {
 
     @Override
     public void execute() {
-        // FR-029: simulation removed — task state is now changed only through explicit user action
         System.out.println("[COLD_KITCHEN] Cold dish command registered for " + products.size() + " product(s)");
     }
 }

@@ -7,7 +7,6 @@ import com.foodtech.kitchen.infrastructure.rest.dto.CreateOrderRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//HUMAN REVIEW: Eliminada "inappropriate intimacy" con Map. Ahora usa ProductRequest tipado.
 public class OrderMapper {
 
     private OrderMapper() {

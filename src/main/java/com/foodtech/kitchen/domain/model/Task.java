@@ -15,7 +15,6 @@ public class Task {
     private LocalDateTime startedAt;
     private LocalDateTime completedAt;
 
-    // Constructor público para CREAR nuevas tasks (sin ID)
     public Task(Long orderId, Station station, String tableNumber,
                 List<Product> products, LocalDateTime createdAt) {
         validate(orderId, station, tableNumber, products, createdAt);
@@ -30,7 +29,6 @@ public class Task {
         this.completedAt = null;
     }
 
-    // Constructor PRIVADO con ID (para reconstrucción)
     private Task(Long id, Long orderId, Station station, String tableNumber,
                  List<Product> products, LocalDateTime createdAt) {
         validate(orderId, station, tableNumber, products, createdAt);
@@ -44,7 +42,6 @@ public class Task {
         this.startedAt = null;
         this.completedAt = null;
     }
-
 
     public static Task reconstruct(Long id, Long orderId, Station station, String tableNumber,
                                    List<Product> products, LocalDateTime createdAt,
@@ -98,7 +95,6 @@ public class Task {
         this.status = TaskStatus.COMPLETED;
         this.completedAt = LocalDateTime.now();
     }
-
 
     public Long getId() {
         return id;

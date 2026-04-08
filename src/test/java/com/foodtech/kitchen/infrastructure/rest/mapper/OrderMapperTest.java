@@ -18,7 +18,6 @@ class OrderMapperTest {
     @Test
     @DisplayName("Should map CreateOrderRequest to Order domain")
     void shouldMapRequestToOrder() {
-        // Given
         CreateOrderRequest request = new CreateOrderRequest(
             "A1",
             List.of(
@@ -27,10 +26,8 @@ class OrderMapperTest {
             )
         );
 
-        // When
         Order order = OrderMapper.toDomain(request);
 
-        // Then
         assertEquals("A1", order.getTableNumber());
         assertEquals(2, order.getProducts().size());
         assertEquals("Coca Cola", order.getProducts().get(0).getName());
@@ -40,7 +37,6 @@ class OrderMapperTest {
     @Test
     @DisplayName("Should handle single product")
     void shouldHandleSingleProduct() {
-        // Given
         CreateOrderRequest request = new CreateOrderRequest(
             "B2",
             List.of(
@@ -48,10 +44,8 @@ class OrderMapperTest {
             )
         );
 
-        // When
         Order order = OrderMapper.toDomain(request);
 
-        // Then
         assertEquals(1, order.getProducts().size());
         assertEquals("Sprite", order.getProducts().get(0).getName());
     }
@@ -59,7 +53,6 @@ class OrderMapperTest {
     @Test
     @DisplayName("Should throw exception for invalid product type")
     void shouldThrowExceptionForInvalidProductType() {
-        // Given
         CreateOrderRequest request = new CreateOrderRequest(
             "C3",
             List.of(
@@ -67,7 +60,6 @@ class OrderMapperTest {
             )
         );
 
-        // When & Then
         assertThrows(IllegalArgumentException.class, () -> OrderMapper.toDomain(request));
     }
 }

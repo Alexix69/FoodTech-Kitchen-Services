@@ -37,17 +37,14 @@ class ProcessOrderUseCaseTest {
     @Test
     @DisplayName("Should process order and save tasks")
     void shouldProcessOrderAndSaveTasks() {
-        // Given
         Product cocaCola = new Product("Coca Cola", ProductType.DRINK);
         Order order = new Order("A1", List.of(cocaCola));
         Order savedOrder = Order.reconstruct(1L, "A1", List.of(cocaCola));
         
         when(orderRepository.save(order)).thenReturn(savedOrder);
 
-        // When
         List<Task> tasks = useCase.execute(order);
 
-        // Then
         assertEquals(1, tasks.size());
         verify(orderRepository, times(1)).save(order);
         verify(taskRepository, times(1)).saveAll(anyList());
@@ -56,7 +53,6 @@ class ProcessOrderUseCaseTest {
     @Test
     @DisplayName("Should process mixed order and save multiple tasks")
     void shouldProcessMixedOrderAndSaveMultipleTasks() {
-        // Given
         Product cocaCola = new Product("Coca Cola", ProductType.DRINK);
         Product pizza = new Product("Pizza", ProductType.HOT_DISH);
         Order order = new Order("B2", List.of(cocaCola, pizza));
@@ -64,10 +60,8 @@ class ProcessOrderUseCaseTest {
         
         when(orderRepository.save(order)).thenReturn(savedOrder);
 
-        // When
         List<Task> tasks = useCase.execute(order);
 
-        // Then
         assertEquals(2, tasks.size());
         verify(taskRepository, times(1)).saveAll(argThat(list -> list.size() == 2));
     }
@@ -75,7 +69,6 @@ class ProcessOrderUseCaseTest {
     @Test
     @DisplayName("Should propagate validation exception from TaskDecomposer")
     void shouldPropagateValidationException() {
-        // When & Then - la validación ya se lanza al crear el Order
         assertThrows(
             IllegalArgumentException.class,
             () -> useCase.execute(new Order("C3", List.of()))

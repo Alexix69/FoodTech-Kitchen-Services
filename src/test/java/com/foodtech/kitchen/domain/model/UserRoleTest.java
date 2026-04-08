@@ -6,9 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * BE1-01: UserRole enum must have exactly three values.
- */
 @Tag("unit")
 class UserRoleTest {
 

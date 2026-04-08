@@ -1,4 +1,3 @@
-// ProductEntity.java - NUEVA entidad
 package com.foodtech.kitchen.infrastructure.persistence.jpa.entities;
 
 import com.foodtech.kitchen.domain.model.ProductType;
@@ -23,7 +22,6 @@ public class ProductEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProductType type;
-
 
     @Column(name = "order_id", insertable = false, updatable = false)
     private Long orderId;
