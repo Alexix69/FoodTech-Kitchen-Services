@@ -203,7 +203,7 @@ jobs:
           exit-code: 0
 
       - name: Scan Docker image with Trivy (table)
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@v0.24.0
         with:
           image-ref: demo:latest
           format: table
