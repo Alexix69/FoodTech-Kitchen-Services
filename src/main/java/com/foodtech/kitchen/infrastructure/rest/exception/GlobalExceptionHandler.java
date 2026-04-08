@@ -1,20 +1,25 @@
 package com.foodtech.kitchen.infrastructure.rest.exception;
 
-import com.foodtech.kitchen.application.exepcions.OrderNotFoundException;
-import com.foodtech.kitchen.application.exepcions.TaskNotFoundException;
-import com.foodtech.kitchen.application.exepcions.DuplicateEmailException;
-import com.foodtech.kitchen.application.exepcions.DuplicateUsernameException;
+import com.foodtech.kitchen.application.exceptions.AccessDeniedException;
+import com.foodtech.kitchen.application.exceptions.InvalidTaskTransitionException;
+import com.foodtech.kitchen.application.exceptions.OrderNotFoundException;
+import com.foodtech.kitchen.application.exceptions.RoleAlreadyAssignedException;
+import com.foodtech.kitchen.application.exceptions.RoleNotAssignedException;
+import com.foodtech.kitchen.application.exceptions.TaskNotFoundException;
+import com.foodtech.kitchen.application.exceptions.DuplicateEmailException;
+import com.foodtech.kitchen.application.exceptions.DuplicateUsernameException;
 import com.foodtech.kitchen.infrastructure.rest.dto.ErrorResponse;
+import com.foodtech.kitchen.infrastructure.rest.dto.RoleNotAssignedResponse;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-//HUMAN REVIEW: Manejo centralizado de excepciones. Cumple SRP: controller solo coordina, este handler maneja errores.
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -73,9 +78,19 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
             ex.getMessage(),
             "Invalid state transition",
-            HttpStatus.BAD_REQUEST.value()
+            HttpStatus.CONFLICT.value()
         );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ErrorResponse> handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException ex) {
+        ErrorResponse error = new ErrorResponse(
+            "Task was modified by another request. Please retry.",
+            "Optimistic locking conflict",
+            HttpStatus.CONFLICT.value()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -122,5 +137,41 @@ public class GlobalExceptionHandler {
             HttpStatus.INTERNAL_SERVER_ERROR.value()
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
+    @ExceptionHandler(RoleNotAssignedException.class)
+    public ResponseEntity<RoleNotAssignedResponse> handleRoleNotAssignedException(RoleNotAssignedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(new RoleNotAssignedResponse("ROLE_NOT_ASSIGNED", ex.getUserId()));
+    }
+
+    @ExceptionHandler(RoleAlreadyAssignedException.class)
+    public ResponseEntity<ErrorResponse> handleRoleAlreadyAssignedException(RoleAlreadyAssignedException ex) {
+        ErrorResponse error = new ErrorResponse(
+            ex.getMessage(),
+            "Role already assigned",
+            HttpStatus.CONFLICT.value()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
+        ErrorResponse error = new ErrorResponse(
+            ex.getMessage(),
+            "Access denied",
+            HttpStatus.FORBIDDEN.value()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(InvalidTaskTransitionException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTaskTransitionException(InvalidTaskTransitionException ex) {
+        ErrorResponse error = new ErrorResponse(
+            ex.getMessage(),
+            "Invalid task transition",
+            HttpStatus.CONFLICT.value()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 }

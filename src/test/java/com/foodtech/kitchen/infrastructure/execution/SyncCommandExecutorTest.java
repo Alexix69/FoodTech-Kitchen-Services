@@ -26,18 +26,15 @@ class SyncCommandExecutorTest {
     @Test
     @DisplayName("Should execute single command")
     void shouldExecuteSingleCommand() {
-        // Given
         Product cocaCola = new Product("Coca Cola", ProductType.DRINK);
         Command command = new PrepareDrinkCommand(List.of(cocaCola));
 
-        // When & Then
         assertDoesNotThrow(() -> executor.execute(command));
     }
 
     @Test
     @DisplayName("Should execute multiple commands")
     void shouldExecuteMultipleCommands() {
-        // Given
         Product cocaCola = new Product("Coca Cola", ProductType.DRINK);
         Product sprite = new Product("Sprite", ProductType.DRINK);
         
@@ -46,17 +43,14 @@ class SyncCommandExecutorTest {
         
         List<Command> commands = List.of(command1, command2);
 
-        // When & Then
         assertDoesNotThrow(() -> executor.executeAll(commands));
     }
 
     @Test
     @DisplayName("Should handle empty command list")
     void shouldHandleEmptyCommandList() {
-        // Given
         List<Command> emptyCommands = List.of();
 
-        // When & Then
         assertDoesNotThrow(() -> executor.executeAll(emptyCommands));
     }
 }

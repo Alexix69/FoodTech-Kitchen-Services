@@ -1,3 +1,3 @@
 package com.foodtech.kitchen.infrastructure.rest.dto;
 
-public record LoginResponse(String token) {}
+public record LoginResponse(String token, String role) {}

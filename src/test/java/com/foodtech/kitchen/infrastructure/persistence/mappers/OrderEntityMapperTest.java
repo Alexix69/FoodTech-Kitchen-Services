@@ -31,17 +31,14 @@ class OrderEntityMapperTest {
 
     @Test
     void toEntity_mapsProductsAndStatus() {
-        // Arrange
         List<Product> products = sampleProducts();
         Product product = products.get(0);
         Order order = Order.reconstruct(10L, "T1", products, OrderStatus.IN_PROGRESS);
         ProductEntity productEntity = ProductEntity.builder().name("Soda").type(ProductType.DRINK).build();
         when(productEntityMapper.toProductEntity(product)).thenReturn(productEntity);
 
-        // Act
         OrderEntity entity = mapper.toEntity(order);
 
-        // Assert
         assertNotNull(entity);
         assertEquals(10L, entity.getId());
         assertEquals("T1", entity.getTableNumber());
@@ -52,7 +49,6 @@ class OrderEntityMapperTest {
 
     @Test
     void toDomain_defaultsStatusWhenNull() {
-        // Arrange
         Product product = new Product("Soda", ProductType.DRINK);
         ProductEntity productEntity = ProductEntity.builder().name("Soda").type(ProductType.DRINK).build();
         when(productEntityMapper.toDomain(productEntity)).thenReturn(product);
@@ -64,10 +60,8 @@ class OrderEntityMapperTest {
                 .products(List.of(productEntity))
                 .build();
 
-        // Act
         Order order = mapper.toDomain(entity);
 
-        // Assert
         assertNotNull(order);
         assertEquals(OrderStatus.CREATED, order.getStatus());
         assertEquals(1, order.getProducts().size());

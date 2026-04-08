@@ -28,4 +28,3 @@ public class Product {
         return type;
     }
 }
-

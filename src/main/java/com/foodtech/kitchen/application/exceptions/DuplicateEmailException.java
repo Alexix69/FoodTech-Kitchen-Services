@@ -1,4 +1,4 @@
-package com.foodtech.kitchen.application.exepcions;
+package com.foodtech.kitchen.application.exceptions;
 
 public class DuplicateEmailException extends RuntimeException {
     public DuplicateEmailException(String message) {

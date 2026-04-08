@@ -41,7 +41,6 @@ class GetCompletedOrdersUseCaseTest {
 
     @Test
     void execute_whenCompletedOrdersExist_returnsViewsWithTiming() {
-        // Arrange
         Order order = Order.reconstruct(1L, "A1", sampleProducts(), OrderStatus.COMPLETED);
         LocalDateTime createdAt = LocalDateTime.of(2026, 1, 1, 9, 50);
         LocalDateTime startedAt1 = LocalDateTime.of(2026, 1, 1, 10, 0);
@@ -77,10 +76,8 @@ class GetCompletedOrdersUseCaseTest {
         when(taskRepository.findByOrderId(1L))
                 .thenReturn(List.of(task1, task2));
 
-        // Act
         List<CompletedOrderView> result = useCase.execute();
 
-        // Assert
         assertEquals(1, result.size());
         CompletedOrderView view = result.get(0);
         assertEquals(1L, view.orderId());
@@ -96,7 +93,6 @@ class GetCompletedOrdersUseCaseTest {
 
     @Test
     void execute_whenNoCompletedTasks_returnsNullTiming() {
-        // Arrange
         Order order = Order.reconstruct(2L, "B2", sampleProducts(), OrderStatus.COMPLETED);
         LocalDateTime createdAt = LocalDateTime.of(2026, 1, 1, 9, 50);
         Task task = Task.reconstruct(
@@ -116,10 +112,8 @@ class GetCompletedOrdersUseCaseTest {
         when(taskRepository.findByOrderId(2L))
                 .thenReturn(List.of(task));
 
-        // Act
         List<CompletedOrderView> result = useCase.execute();
 
-        // Assert
         CompletedOrderView view = result.get(0);
         assertNull(view.completedAt());
         assertNull(view.totalPreparationTime());

@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-//HUMAN REVIEW: Extraje la creación de tareas a su propia clase.
-//Cumple SRP: solo se encarga de construir objetos Task a partir de productos agrupados.
 public class TaskFactory {
 
     public List<Task> createTasks(Long orderId, String tableNumber, Map<Station, List<Product>> productsByStation) {

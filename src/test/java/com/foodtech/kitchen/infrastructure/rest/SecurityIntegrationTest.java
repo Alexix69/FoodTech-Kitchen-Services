@@ -9,9 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.foodtech.kitchen.domain.model.UserRole;
 import com.foodtech.kitchen.infrastructure.security.JwtTokenGenerator;
 import java.time.Clock;
 import java.time.Instant;
@@ -21,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.foodtech.kitchen.application.ports.out.TokenGenerator;
 
 @Tag("integration")
 @SpringBootTest
@@ -32,7 +31,7 @@ class SecurityIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private TokenGenerator tokenGenerator;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -44,29 +43,15 @@ class SecurityIntegrationTest {
                 .andExpect(status().isUnauthorized());
     }
 
-        @Test
-        @DisplayName("RED: Protected endpoint with valid token returns 200")
-        void protectedEndpoint_withValidToken_returns200() throws Exception {
-        String registerBody = "{\"username\":\"auth-user\",\"email\":\"auth-user@example.com\",\"password\":\"abc123\"}";
-        mockMvc.perform(post("/api/auth/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(registerBody))
-            .andExpect(status().isCreated());
+    @Test
+    @DisplayName("RED: Protected endpoint with valid token returns 200")
+    void protectedEndpoint_withValidToken_returns200() throws Exception {
+        String cocineroToken = tokenGenerator.generateToken("cocinero-user", UserRole.COCINERO);
 
-        String loginBody = "{\"identifier\":\"auth-user@example.com\",\"password\":\"abc123\"}";
-        MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(loginBody))
-            .andExpect(status().isOk())
-            .andReturn();
-
-        JsonNode json = objectMapper.readTree(loginResult.getResponse().getContentAsString());
-        String token = json.get("token").asText();
-
-        mockMvc.perform(get("/api/tasks/station/BAR")
-            .header("Authorization", "Bearer " + token))
+        mockMvc.perform(get("/api/tasks/station/HOT_KITCHEN")
+            .header("Authorization", "Bearer " + cocineroToken))
             .andExpect(status().isOk());
-        }
+    }
 
     @Test
     @DisplayName("RED: Protected endpoint with expired token returns 401")
@@ -74,7 +59,7 @@ class SecurityIntegrationTest {
         Instant fixedInstant = Instant.parse("2020-01-01T00:00:00Z");
         Clock fixedClock = Clock.fixed(fixedInstant, ZoneOffset.UTC);
         JwtTokenGenerator generator = new JwtTokenGenerator(jwtSecret, 1L, fixedClock);
-        String expiredToken = generator.generateToken("auth-user");
+        String expiredToken = generator.generateToken("auth-user", UserRole.MESERO);
 
         mockMvc.perform(get("/api/tasks/station/BAR")
                 .header("Authorization", "Bearer " + expiredToken))
@@ -99,10 +84,50 @@ class SecurityIntegrationTest {
                 3600L,
                 fixedClock
         );
-        String invalidSignatureToken = generator.generateToken("auth-user");
+        String invalidSignatureToken = generator.generateToken("auth-user", UserRole.MESERO);
 
         mockMvc.perform(get("/api/tasks/station/BAR")
                 .header("Authorization", "Bearer " + invalidSignatureToken))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("BE5-02 (1): COCINERO JWT on POST /api/orders returns 403")
+    void cocineroToken_onPostOrders_returns403() throws Exception {
+        String cocineroToken = tokenGenerator.generateToken("cocinero-security", UserRole.COCINERO);
+        String body = "{\"tableNumber\":\"T1\",\"products\":[{\"name\":\"Pizza\",\"type\":\"HOT_DISH\"}]}";
+
+        mockMvc.perform(post("/api/orders")
+                .header("Authorization", "Bearer " + cocineroToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("BE5-02 (2): MESERO JWT on POST /api/orders passes Spring Security")
+    void meseroToken_onPostOrders_passesSpringSecurity() throws Exception {
+        String meseroToken = tokenGenerator.generateToken("mesero-security", UserRole.MESERO);
+        String body = "{\"tableNumber\":\"T2\",\"products\":[{\"name\":\"Coca Cola\",\"type\":\"DRINK\"}]}";
+
+        mockMvc.perform(post("/api/orders")
+                .header("Authorization", "Bearer " + meseroToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+                .andExpect(result -> {
+                    int status = result.getResponse().getStatus();
+                    org.junit.jupiter.api.Assertions.assertNotEquals(401, status);
+                    org.junit.jupiter.api.Assertions.assertNotEquals(403, status);
+                });
+    }
+
+    @Test
+    @DisplayName("BE5-02 (3): MESERO JWT on GET /api/tasks/station/BAR returns 403")
+    void meseroToken_onGetTasksByStation_returns403() throws Exception {
+        String meseroToken = tokenGenerator.generateToken("mesero-security-2", UserRole.MESERO);
+
+        mockMvc.perform(get("/api/tasks/station/BAR")
+                .header("Authorization", "Bearer " + meseroToken))
+                .andExpect(status().isForbidden());
     }
 }

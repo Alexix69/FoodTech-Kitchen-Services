@@ -1,6 +1,6 @@
 package com.foodtech.kitchen.application.usecases;
 
-import com.foodtech.kitchen.application.exepcions.OrderNotFoundException;
+import com.foodtech.kitchen.application.exceptions.OrderNotFoundException;
 import com.foodtech.kitchen.application.ports.in.GetOrderStatusPort;
 import com.foodtech.kitchen.application.ports.out.OrderRepository;
 import com.foodtech.kitchen.application.ports.out.TaskRepository;
@@ -31,12 +31,10 @@ public class GetOrderStatusUseCase implements GetOrderStatusPort {
             .orElseThrow(() -> new OrderNotFoundException(orderId));
         List<Task> tasks = taskRepository.findByOrderId(orderId);
 
-        // Validación de aplicación: el orderId debe existir
         if (tasks.isEmpty()) {
             throw new OrderNotFoundException(orderId);
         }
 
-        // Delegar lógica de negocio al dominio
         TaskStatus taskDerivedStatus = orderStatusCalculator.calculateOrderStatus(tasks);
         TaskStatus persistedStatus = orderStatusCalculator.calculateOrderStatus(order.getStatus(), tasks);
 

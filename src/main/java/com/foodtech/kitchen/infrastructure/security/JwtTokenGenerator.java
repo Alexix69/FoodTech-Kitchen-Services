@@ -1,6 +1,7 @@
 package com.foodtech.kitchen.infrastructure.security;
 
 import com.foodtech.kitchen.application.ports.out.TokenGenerator;
+import com.foodtech.kitchen.domain.model.UserRole;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -30,7 +31,7 @@ public class JwtTokenGenerator implements TokenGenerator {
     }
 
     @Override
-    public String generateToken(String username) {
+    public String generateToken(String username, UserRole role) {
         Instant now = clock.instant();
         Instant expiration = now.plusSeconds(expirationSeconds);
 
@@ -38,6 +39,7 @@ public class JwtTokenGenerator implements TokenGenerator {
                 .setSubject(username)
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(expiration))
+                .claim("role", role.name())
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
                 .compact();
     }

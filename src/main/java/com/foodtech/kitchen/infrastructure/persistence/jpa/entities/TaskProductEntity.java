@@ -23,7 +23,6 @@ public class TaskProductEntity {
     @Column(nullable = false)
     private ProductType type;
 
-    // JPA maneja esta relación automáticamente con @JoinColumn en TaskEntity
     @Column(name = "task_id", insertable = false, updatable = false)
     private Long taskId;
 }

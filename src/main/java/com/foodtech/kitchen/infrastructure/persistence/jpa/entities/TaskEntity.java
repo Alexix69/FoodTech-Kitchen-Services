@@ -22,6 +22,9 @@ public class TaskEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Long version;
+
     @Column(name = "order_id", nullable = false)
     private Long orderId;
 
@@ -32,7 +35,6 @@ public class TaskEntity {
     @Column(name = "table_number", nullable = false)
     private String tableNumber;
 
-    // ✅ Relación OneToMany - Reemplaza el campo JSON
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "task_id", nullable = false)
     @Builder.Default

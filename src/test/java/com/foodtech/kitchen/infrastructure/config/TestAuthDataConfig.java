@@ -3,6 +3,7 @@ package com.foodtech.kitchen.infrastructure.config;
 import com.foodtech.kitchen.application.ports.out.PasswordHasher;
 import com.foodtech.kitchen.application.ports.out.UserRepository;
 import com.foodtech.kitchen.domain.model.User;
+import com.foodtech.kitchen.domain.model.UserRole;
 import com.foodtech.kitchen.domain.model.UserStatus;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +22,7 @@ public class TestAuthDataConfig {
                 return;
             }
             String passwordHash = passwordHasher.hash("abc123");
-            User user = new User("jdoe", email, passwordHash, UserStatus.ACTIVE);
+            User user = new User("jdoe", email, passwordHash, UserStatus.ACTIVE, UserRole.MESERO);
             userRepository.save(user);
         };
     }

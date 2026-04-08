@@ -3,13 +3,19 @@ package com.foodtech.kitchen.infrastructure.persistence.adapters;
 import com.foodtech.kitchen.domain.model.*;
 import com.foodtech.kitchen.infrastructure.persistence.jpa.TaskJpaRepository;
 import com.foodtech.kitchen.infrastructure.persistence.jpa.entities.TaskEntity;
+import com.foodtech.kitchen.infrastructure.persistence.jpa.entities.TaskProductEntity;
+import com.foodtech.kitchen.infrastructure.persistence.mappers.ProductEntityMapper;
+import com.foodtech.kitchen.infrastructure.persistence.mappers.TaskEntityMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -23,33 +29,29 @@ class TaskRepositoryAdapterTest {
     @BeforeEach
     void setUp() {
         jpaRepository = mock(TaskJpaRepository.class);
-        com.foodtech.kitchen.infrastructure.persistence.mappers.ProductEntityMapper productMapper =
-            new com.foodtech.kitchen.infrastructure.persistence.mappers.ProductEntityMapper();
-        com.foodtech.kitchen.infrastructure.persistence.mappers.TaskEntityMapper mapper = 
-            new com.foodtech.kitchen.infrastructure.persistence.mappers.TaskEntityMapper(productMapper);
+        ProductEntityMapper productMapper =
+            new ProductEntityMapper();
+        TaskEntityMapper mapper =
+            new TaskEntityMapper(productMapper);
         adapter = new TaskRepositoryAdapter(jpaRepository, mapper);
     }
 
     @Test
     @DisplayName("Should save tasks using JPA repository")
     void shouldSaveTasks() {
-        // Given
         Product product = new Product("Coca Cola", ProductType.DRINK);
         Task task = new Task(1L, Station.BAR, "A1", List.of(product), LocalDateTime.now());
 
-        // When
         adapter.saveAll(List.of(task));
 
-        // Then
         verify(jpaRepository, times(1)).saveAll(anyList());
     }
 
     @Test
     @DisplayName("Should find tasks by station")
     void shouldFindTasksByStation() {
-        // Given
-        com.foodtech.kitchen.infrastructure.persistence.jpa.entities.TaskProductEntity p =
-            com.foodtech.kitchen.infrastructure.persistence.jpa.entities.TaskProductEntity.builder()
+        TaskProductEntity p =
+            TaskProductEntity.builder()
                 .name("Coca Cola").type(ProductType.DRINK).build();
 
         TaskEntity entity = TaskEntity.builder()
@@ -64,10 +66,8 @@ class TaskRepositoryAdapterTest {
         when(jpaRepository.findByStation(Station.BAR))
             .thenReturn(List.of(entity));
 
-        // When
         List<Task> tasks = adapter.findByStation(Station.BAR);
 
-        // Then
         assertEquals(1, tasks.size());
         assertEquals(Station.BAR, tasks.get(0).getStation());
         verify(jpaRepository, times(1)).findByStation(Station.BAR);
@@ -76,9 +76,8 @@ class TaskRepositoryAdapterTest {
     @Test
     @DisplayName("Should find all tasks")
     void shouldFindAllTasks() {
-        // Given
-        com.foodtech.kitchen.infrastructure.persistence.jpa.entities.TaskProductEntity p =
-            com.foodtech.kitchen.infrastructure.persistence.jpa.entities.TaskProductEntity.builder()
+        TaskProductEntity p =
+            TaskProductEntity.builder()
                 .name("Coca Cola").type(ProductType.DRINK).build();
 
         TaskEntity entity = TaskEntity.builder()
@@ -92,10 +91,8 @@ class TaskRepositoryAdapterTest {
         
         when(jpaRepository.findAll()).thenReturn(List.of(entity));
 
-        // When
         List<Task> tasks = adapter.findAll();
 
-        // Then
         assertEquals(1, tasks.size());
         verify(jpaRepository, times(1)).findAll();
     }
@@ -103,9 +100,8 @@ class TaskRepositoryAdapterTest {
     @Test
     @DisplayName("Should find tasks by station and status")
     void shouldFindTasksByStationAndStatus() {
-        // Given
-        com.foodtech.kitchen.infrastructure.persistence.jpa.entities.TaskProductEntity p =
-            com.foodtech.kitchen.infrastructure.persistence.jpa.entities.TaskProductEntity.builder()
+        TaskProductEntity p =
+            TaskProductEntity.builder()
                 .name("Coca Cola").type(ProductType.DRINK).build();
 
         TaskEntity completedEntity = TaskEntity.builder()
@@ -123,13 +119,142 @@ class TaskRepositoryAdapterTest {
         when(jpaRepository.findByStationAndStatus(Station.BAR, TaskStatus.COMPLETED))
             .thenReturn(List.of(completedEntity));
 
-        // When
         List<Task> tasks = adapter.findByStationAndStatus(Station.BAR, TaskStatus.COMPLETED);
 
-        // Then
         assertEquals(1, tasks.size());
         assertEquals(Station.BAR, tasks.get(0).getStation());
         assertEquals(TaskStatus.COMPLETED, tasks.get(0).getStatus());
         verify(jpaRepository, times(1)).findByStationAndStatus(Station.BAR, TaskStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("Should find PENDING tasks for HOT_KITCHEN and COLD_KITCHEN stations using FIFO order")
+    void shouldFindPendingTasksForHotAndColdKitchenStations() {
+        TaskProductEntity p =
+            TaskProductEntity.builder()
+                .name("Pasta").type(ProductType.HOT_DISH).build();
+
+        TaskEntity hotTask = TaskEntity.builder()
+            .id(1L).orderId(1L).station(Station.HOT_KITCHEN).tableNumber("B2")
+            .products(List.of(p)).status(TaskStatus.PENDING).createdAt(LocalDateTime.now()).build();
+
+        TaskEntity coldTask = TaskEntity.builder()
+            .id(2L).orderId(2L).station(Station.COLD_KITCHEN).tableNumber("C3")
+            .products(List.of(p)).status(TaskStatus.PENDING).createdAt(LocalDateTime.now().plusSeconds(1)).build();
+
+        Set<Station> stations = Set.of(Station.HOT_KITCHEN, Station.COLD_KITCHEN);
+
+        when(jpaRepository.findByStationInAndStatusOrderByCreatedAtAsc(stations, TaskStatus.PENDING))
+            .thenReturn(List.of(hotTask, coldTask));
+
+        List<Task> tasks = adapter.findByStationsAndStatus(stations, TaskStatus.PENDING);
+
+        assertEquals(2, tasks.size());
+        assertTrue(tasks.stream().allMatch(t ->
+            t.getStation() == Station.HOT_KITCHEN || t.getStation() == Station.COLD_KITCHEN));
+        verify(jpaRepository, times(1))
+            .findByStationInAndStatusOrderByCreatedAtAsc(stations, TaskStatus.PENDING);
+    }
+
+    @Test
+    @DisplayName("Should find PENDING tasks for BAR station only")
+    void shouldFindPendingTasksForBarStation() {
+        TaskProductEntity p =
+            TaskProductEntity.builder()
+                .name("Mojito").type(ProductType.DRINK).build();
+
+        TaskEntity barTask = TaskEntity.builder()
+            .id(3L).orderId(3L).station(Station.BAR).tableNumber("A1")
+            .products(List.of(p)).status(TaskStatus.PENDING).createdAt(LocalDateTime.now()).build();
+
+        Set<Station> stations = Set.of(Station.BAR);
+
+        when(jpaRepository.findByStationInAndStatusOrderByCreatedAtAsc(stations, TaskStatus.PENDING))
+            .thenReturn(List.of(barTask));
+
+        List<Task> tasks = adapter.findByStationsAndStatus(stations, TaskStatus.PENDING);
+
+        assertEquals(1, tasks.size());
+        assertEquals(Station.BAR, tasks.get(0).getStation());
+        verify(jpaRepository, times(1))
+            .findByStationInAndStatusOrderByCreatedAtAsc(stations, TaskStatus.PENDING);
+    }
+
+    @Test
+    @DisplayName("save() should persist a new entity when task has no ID")
+    void save_shouldCreateNewTaskEntity() {
+        Product product = new Product("Burger", ProductType.HOT_DISH);
+        Task newTask = new Task(1L, Station.HOT_KITCHEN, "B1", List.of(product), LocalDateTime.now());
+
+        TaskProductEntity p = TaskProductEntity.builder()
+            .name("Burger").type(ProductType.HOT_DISH).build();
+        TaskEntity savedEntity = TaskEntity.builder()
+            .id(10L).orderId(1L).station(Station.HOT_KITCHEN).tableNumber("B1")
+            .products(List.of(p)).createdAt(LocalDateTime.now()).build();
+
+        when(jpaRepository.save(any(TaskEntity.class))).thenReturn(savedEntity);
+
+        Task result = adapter.save(newTask);
+
+        assertNotNull(result);
+        assertEquals(Station.HOT_KITCHEN, result.getStation());
+        verify(jpaRepository).save(any(TaskEntity.class));
+    }
+
+    @Test
+    @DisplayName("save() should update existing entity when task has an ID")
+    void save_shouldUpdateExistingTaskEntity() {
+        LocalDateTime now = LocalDateTime.now();
+        Product product = new Product("Burger", ProductType.HOT_DISH);
+        Task existingTask = Task.reconstruct(
+            5L, 1L, Station.HOT_KITCHEN, "B1", List.of(product),
+            now, TaskStatus.IN_PREPARATION, now, null
+        );
+
+        TaskProductEntity p = TaskProductEntity.builder()
+            .name("Burger").type(ProductType.HOT_DISH).build();
+        TaskEntity existingEntity = TaskEntity.builder()
+            .id(5L).orderId(1L).station(Station.HOT_KITCHEN).tableNumber("B1")
+            .products(List.of(p)).status(TaskStatus.PENDING).createdAt(now).build();
+
+        when(jpaRepository.findById(5L)).thenReturn(Optional.of(existingEntity));
+        when(jpaRepository.save(existingEntity)).thenReturn(existingEntity);
+
+        Task result = adapter.save(existingTask);
+
+        assertNotNull(result);
+        verify(jpaRepository).findById(5L);
+        verify(jpaRepository).save(existingEntity);
+    }
+
+    @Test
+    @DisplayName("findById() should return empty Optional when ID does not exist")
+    void findById_shouldReturnEmptyWhenNotFound() {
+        when(jpaRepository.findByIdWithProducts(999L)).thenReturn(Optional.empty());
+
+        Optional<Task> result = adapter.findById(999L);
+
+        assertTrue(result.isEmpty());
+        verify(jpaRepository).findByIdWithProducts(999L);
+    }
+
+    @Test
+    @DisplayName("findByOrderId() should return all tasks for a given orderId")
+    void findByOrderId_shouldReturnTasksForOrder() {
+        TaskProductEntity p = TaskProductEntity.builder()
+            .name("Pizza").type(ProductType.HOT_DISH).build();
+        TaskEntity task1 = TaskEntity.builder()
+            .id(1L).orderId(10L).station(Station.HOT_KITCHEN).tableNumber("A1")
+            .products(List.of(p)).createdAt(LocalDateTime.now()).build();
+        TaskEntity task2 = TaskEntity.builder()
+            .id(2L).orderId(10L).station(Station.HOT_KITCHEN).tableNumber("A1")
+            .products(List.of(p)).createdAt(LocalDateTime.now()).build();
+
+        when(jpaRepository.findByOrderId(10L)).thenReturn(List.of(task1, task2));
+
+        List<Task> tasks = adapter.findByOrderId(10L);
+
+        assertEquals(2, tasks.size());
+        verify(jpaRepository).findByOrderId(10L);
     }
 }

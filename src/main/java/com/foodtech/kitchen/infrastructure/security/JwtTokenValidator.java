@@ -23,26 +23,28 @@ public class JwtTokenValidator {
         this.clock = clock;
     }
 
-    public String validateAndGetSubject(String token) {
+    public Claims validateAndGetClaims(String token) {
         if (token == null || token.isBlank()) {
             throw new IllegalArgumentException("Token must not be blank");
         }
-
         try {
-            Claims claims = Jwts.parserBuilder()
+            return Jwts.parserBuilder()
                     .setClock(() -> Date.from(clock.instant()))
                     .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-
-            String subject = claims.getSubject();
-            if (subject == null || subject.isBlank()) {
-                throw new IllegalArgumentException("Token subject must not be blank");
-            }
-            return subject;
         } catch (JwtException | IllegalArgumentException ex) {
             throw new IllegalArgumentException("Invalid token", ex);
         }
+    }
+
+    public String validateAndGetSubject(String token) {
+        Claims claims = validateAndGetClaims(token);
+        String subject = claims.getSubject();
+        if (subject == null || subject.isBlank()) {
+            throw new IllegalArgumentException("Token subject must not be blank");
+        }
+        return subject;
     }
 }

@@ -1,7 +1,9 @@
 package com.foodtech.kitchen.infrastructure.persistence.jpa;
 
+import com.foodtech.kitchen.domain.model.ProductType;
 import com.foodtech.kitchen.domain.model.Station;
 import com.foodtech.kitchen.infrastructure.persistence.jpa.entities.TaskEntity;
+import com.foodtech.kitchen.infrastructure.persistence.jpa.entities.TaskProductEntity;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -26,10 +28,9 @@ class TaskJpaRepositoryTest {
     @Test
     @DisplayName("Should save and find task")
     void shouldSaveAndFindTask() {
-        // Given
-        com.foodtech.kitchen.infrastructure.persistence.jpa.entities.TaskProductEntity p =
-            com.foodtech.kitchen.infrastructure.persistence.jpa.entities.TaskProductEntity.builder()
-                .name("Coca Cola").type(com.foodtech.kitchen.domain.model.ProductType.DRINK).build();
+        TaskProductEntity p =
+            TaskProductEntity.builder()
+                .name("Coca Cola").type(ProductType.DRINK).build();
 
         TaskEntity task = TaskEntity.builder()
             .orderId(1L)
@@ -38,11 +39,9 @@ class TaskJpaRepositoryTest {
             .products(List.of(p))
             .build();
 
-        // When
         TaskEntity saved = repository.save(task);
         TaskEntity found = repository.findById(saved.getId()).orElse(null);
 
-        // Then
         assertNotNull(found);
         assertEquals(Station.BAR, found.getStation());
         assertEquals("A1", found.getTableNumber());
@@ -51,7 +50,6 @@ class TaskJpaRepositoryTest {
     @Test
     @DisplayName("Should find tasks by station")
     void shouldFindTasksByStation() {
-        // Given
         TaskEntity barTask = TaskEntity.builder()
             .orderId(1L)
             .station(Station.BAR)
@@ -69,10 +67,8 @@ class TaskJpaRepositoryTest {
         repository.save(barTask);
         repository.save(kitchenTask);
 
-        // When
         List<TaskEntity> barTasks = repository.findByStation(Station.BAR);
 
-        // Then
         assertEquals(1, barTasks.size());
         assertEquals(Station.BAR, barTasks.get(0).getStation());
     }

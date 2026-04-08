@@ -1,5 +1,6 @@
 package com.foodtech.kitchen.infrastructure.security;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +9,8 @@ import java.io.IOException;
 import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -32,9 +35,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(BEARER_PREFIX.length()).trim();
         try {
-            String subject = tokenValidator.validateAndGetSubject(token);
+            Claims claims = tokenValidator.validateAndGetClaims(token);
+            String subject = claims.getSubject();
+            String roleClaim = claims.get("role", String.class);
+
+            List<GrantedAuthority> authorities;
+            if (roleClaim != null && !roleClaim.isBlank()) {
+                authorities = List.of(new SimpleGrantedAuthority("ROLE_" + roleClaim));
+            } else {
+                authorities = List.of();
+            }
+
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(subject, null, List.of());
+                    new UsernamePasswordAuthenticationToken(subject, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
         } catch (IllegalArgumentException ex) {

@@ -33,7 +33,6 @@ class GetOrderStatusUseCaseTest {
     @Test
     @DisplayName("Should return COMPLETED when all tasks are completed")
     void shouldReturnCompletedWhenAllTasksCompleted() {
-        // Given - un pedido con 3 tareas completadas
         Long orderId = 1L;
         Product product = new Product("Pizza", ProductType.HOT_DISH);
         
@@ -53,10 +52,8 @@ class GetOrderStatusUseCaseTest {
         when(taskRepository.findByOrderId(orderId))
             .thenReturn(List.of(completedTask1, completedTask2, completedTask3));
 
-        // When
         TaskStatus orderStatus = useCase.execute(orderId);
 
-        // Then
         assertEquals(TaskStatus.COMPLETED, orderStatus);
         verify(taskRepository, times(1)).findByOrderId(orderId);
     }
@@ -64,7 +61,6 @@ class GetOrderStatusUseCaseTest {
     @Test
     @DisplayName("Should return IN_PREPARATION when at least one task is in preparation")
     void shouldReturnInPreparationWhenAnyTaskInPreparation() {
-        // Given - un pedido con 2 tareas completadas y 1 en preparación
         Long orderId = 1L;
         Product product = new Product("Pizza", ProductType.HOT_DISH);
         
@@ -84,10 +80,8 @@ class GetOrderStatusUseCaseTest {
         when(taskRepository.findByOrderId(orderId))
             .thenReturn(List.of(completedTask1, completedTask2, inPreparationTask));
 
-        // When
         TaskStatus orderStatus = useCase.execute(orderId);
 
-        // Then
         assertEquals(TaskStatus.IN_PREPARATION, orderStatus);
         verify(taskRepository, times(1)).findByOrderId(orderId);
     }
@@ -95,7 +89,6 @@ class GetOrderStatusUseCaseTest {
     @Test
     @DisplayName("Should return PENDING when all tasks are pending")
     void shouldReturnPendingWhenAllTasksPending() {
-        // Given - un pedido con todas las tareas pendientes
         Long orderId = 1L;
         Product product = new Product("Pizza", ProductType.HOT_DISH);
         
@@ -110,10 +103,8 @@ class GetOrderStatusUseCaseTest {
         when(taskRepository.findByOrderId(orderId))
             .thenReturn(List.of(pendingTask1, pendingTask2));
 
-        // When
         TaskStatus orderStatus = useCase.execute(orderId);
 
-        // Then
         assertEquals(TaskStatus.PENDING, orderStatus);
         verify(taskRepository, times(1)).findByOrderId(orderId);
     }
@@ -121,7 +112,6 @@ class GetOrderStatusUseCaseTest {
     @Test
     @DisplayName("Should return IN_PREPARATION when there are pending and in preparation tasks")
     void shouldReturnInPreparationWhenMixedStates() {
-        // Given - un pedido con tareas pendientes y en preparación
         Long orderId = 1L;
         Product product = new Product("Pizza", ProductType.HOT_DISH);
         
@@ -137,10 +127,8 @@ class GetOrderStatusUseCaseTest {
         when(taskRepository.findByOrderId(orderId))
             .thenReturn(List.of(pendingTask, inPreparationTask));
 
-        // When
         TaskStatus orderStatus = useCase.execute(orderId);
 
-        // Then
         assertEquals(TaskStatus.IN_PREPARATION, orderStatus);
         verify(taskRepository, times(1)).findByOrderId(orderId);
     }
@@ -148,7 +136,6 @@ class GetOrderStatusUseCaseTest {
     @Test
     @DisplayName("Should return IN_PREPARATION when some tasks are completed but not all")
     void shouldReturnInPreparationWhenSomeTasksCompleted() {
-        // Given - un pedido con 1 tarea completada y 2 pendientes (caso Postman)
         Long orderId = 1L;
         Product product = new Product("Pizza", ProductType.HOT_DISH);
         
@@ -166,10 +153,8 @@ class GetOrderStatusUseCaseTest {
         when(taskRepository.findByOrderId(orderId))
             .thenReturn(List.of(completedTask, pendingTask1, pendingTask2));
 
-        // When
         TaskStatus orderStatus = useCase.execute(orderId);
 
-        // Then
         assertEquals(TaskStatus.IN_PREPARATION, orderStatus);
         verify(taskRepository, times(1)).findByOrderId(orderId);
     }

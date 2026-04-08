@@ -1,7 +1,10 @@
 package com.foodtech.kitchen.infrastructure.persistence.jpa.entities;
 
+import com.foodtech.kitchen.domain.model.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,6 +30,10 @@ public class UserEntity {
 
     @Column(nullable = false)
     private String status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = true)
+    private UserRole role;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -74,6 +81,14 @@ public class UserEntity {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 
     public LocalDateTime getCreatedAt() {
