@@ -64,4 +64,37 @@ class TaskTest {
         assertEquals("Task must be in IN_PREPARATION status to complete", exception.getMessage());
         assertEquals(TaskStatus.PENDING, task.getStatus());
     }
+
+    @Test
+    void shouldThrowWhenStartingAlreadyInPreparationTask() {
+        Product product = new Product("Cerveza", ProductType.DRINK);
+        Task task = new Task(
+                1L,
+                Station.BAR,
+                "A1",
+                List.of(product),
+                LocalDateTime.now()
+        );
+        task.start();
+
+        assertThrows(IllegalStateException.class, () -> task.start());
+        assertEquals(TaskStatus.IN_PREPARATION, task.getStatus());
+    }
+
+    @Test
+    void shouldThrowWhenStartingCompletedTask() {
+        Product product = new Product("Cerveza", ProductType.DRINK);
+        Task task = new Task(
+                1L,
+                Station.BAR,
+                "A1",
+                List.of(product),
+                LocalDateTime.now()
+        );
+        task.start();
+        task.complete();
+
+        assertThrows(IllegalStateException.class, () -> task.start());
+        assertEquals(TaskStatus.COMPLETED, task.getStatus());
+    }
 }

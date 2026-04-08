@@ -1,6 +1,7 @@
 package com.foodtech.kitchen.application.usecases;
 
 import com.foodtech.kitchen.application.exceptions.AccessDeniedException;
+import com.foodtech.kitchen.application.exceptions.OrderNotFoundException;
 import com.foodtech.kitchen.application.exceptions.TaskNotFoundException;
 import com.foodtech.kitchen.application.ports.out.OrderRepository;
 import com.foodtech.kitchen.application.ports.out.TaskRepository;
@@ -155,5 +156,66 @@ class StartTaskPreparationUseCaseTest {
         assertNotNull(result);
         assertEquals(TaskStatus.IN_PREPARATION, result.getStatus());
         verify(asyncCommandDispatcher).dispatch(command, taskId);
+    }
+
+    @Test
+    void shouldThrowAccessDeniedWhenMeseroTriesToStartTask() {
+        Long taskId = 20L;
+        LocalDateTime now = LocalDateTime.of(2026, 2, 20, 12, 0);
+        Product product = new Product("Burger", ProductType.HOT_DISH);
+        Task pendingTask = Task.reconstruct(
+                taskId, 1L, Station.HOT_KITCHEN, "A1", List.of(product),
+                now, TaskStatus.PENDING, null, null
+        );
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(pendingTask));
+
+        assertThrows(
+            AccessDeniedException.class,
+            () -> useCase.execute(taskId, UserRole.MESERO)
+        );
+
+        verify(taskRepository, never()).save(any(Task.class));
+        verifyNoInteractions(asyncCommandDispatcher);
+    }
+
+    @Test
+    void shouldThrowOrderNotFoundWhenOrderRepositoryReturnsEmpty() {
+        Long taskId = 21L;
+        LocalDateTime now = LocalDateTime.of(2026, 2, 20, 12, 0);
+        Product product = new Product("Cerveza", ProductType.DRINK);
+        Task pendingTask = Task.reconstruct(
+                taskId, 2L, Station.BAR, "A1", List.of(product),
+                now, TaskStatus.PENDING, null, null
+        );
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(pendingTask));
+        when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(orderRepository.findById(2L)).thenReturn(Optional.empty());
+
+        assertThrows(
+            OrderNotFoundException.class,
+            () -> useCase.execute(taskId, UserRole.BARTENDER)
+        );
+    }
+
+    @Test
+    void shouldThrowIllegalStateWhenTaskIsAlreadyInPreparation() {
+        Long taskId = 22L;
+        LocalDateTime now = LocalDateTime.of(2026, 2, 20, 12, 0);
+        Product product = new Product("Cerveza", ProductType.DRINK);
+        Task inPreparationTask = Task.reconstruct(
+                taskId, 3L, Station.BAR, "A1", List.of(product),
+                now, TaskStatus.IN_PREPARATION, now, null
+        );
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(inPreparationTask));
+
+        assertThrows(
+            IllegalStateException.class,
+            () -> useCase.execute(taskId, UserRole.BARTENDER)
+        );
+
+        verify(taskRepository, never()).save(any(Task.class));
     }
 }

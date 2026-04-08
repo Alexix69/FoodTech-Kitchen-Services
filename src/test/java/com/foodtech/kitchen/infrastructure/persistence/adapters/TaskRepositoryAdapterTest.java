@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Tag;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -177,5 +178,83 @@ class TaskRepositoryAdapterTest {
         assertEquals(Station.BAR, tasks.get(0).getStation());
         verify(jpaRepository, times(1))
             .findByStationInAndStatusOrderByCreatedAtAsc(stations, TaskStatus.PENDING);
+    }
+
+    @Test
+    @DisplayName("save() should persist a new entity when task has no ID")
+    void save_shouldCreateNewTaskEntity() {
+        Product product = new Product("Burger", ProductType.HOT_DISH);
+        Task newTask = new Task(1L, Station.HOT_KITCHEN, "B1", List.of(product), LocalDateTime.now());
+
+        TaskProductEntity p = TaskProductEntity.builder()
+            .name("Burger").type(ProductType.HOT_DISH).build();
+        TaskEntity savedEntity = TaskEntity.builder()
+            .id(10L).orderId(1L).station(Station.HOT_KITCHEN).tableNumber("B1")
+            .products(List.of(p)).createdAt(LocalDateTime.now()).build();
+
+        when(jpaRepository.save(any(TaskEntity.class))).thenReturn(savedEntity);
+
+        Task result = adapter.save(newTask);
+
+        assertNotNull(result);
+        assertEquals(Station.HOT_KITCHEN, result.getStation());
+        verify(jpaRepository).save(any(TaskEntity.class));
+    }
+
+    @Test
+    @DisplayName("save() should update existing entity when task has an ID")
+    void save_shouldUpdateExistingTaskEntity() {
+        LocalDateTime now = LocalDateTime.now();
+        Product product = new Product("Burger", ProductType.HOT_DISH);
+        Task existingTask = Task.reconstruct(
+            5L, 1L, Station.HOT_KITCHEN, "B1", List.of(product),
+            now, TaskStatus.IN_PREPARATION, now, null
+        );
+
+        TaskProductEntity p = TaskProductEntity.builder()
+            .name("Burger").type(ProductType.HOT_DISH).build();
+        TaskEntity existingEntity = TaskEntity.builder()
+            .id(5L).orderId(1L).station(Station.HOT_KITCHEN).tableNumber("B1")
+            .products(List.of(p)).status(TaskStatus.PENDING).createdAt(now).build();
+
+        when(jpaRepository.findById(5L)).thenReturn(Optional.of(existingEntity));
+        when(jpaRepository.save(existingEntity)).thenReturn(existingEntity);
+
+        Task result = adapter.save(existingTask);
+
+        assertNotNull(result);
+        verify(jpaRepository).findById(5L);
+        verify(jpaRepository).save(existingEntity);
+    }
+
+    @Test
+    @DisplayName("findById() should return empty Optional when ID does not exist")
+    void findById_shouldReturnEmptyWhenNotFound() {
+        when(jpaRepository.findByIdWithProducts(999L)).thenReturn(Optional.empty());
+
+        Optional<Task> result = adapter.findById(999L);
+
+        assertTrue(result.isEmpty());
+        verify(jpaRepository).findByIdWithProducts(999L);
+    }
+
+    @Test
+    @DisplayName("findByOrderId() should return all tasks for a given orderId")
+    void findByOrderId_shouldReturnTasksForOrder() {
+        TaskProductEntity p = TaskProductEntity.builder()
+            .name("Pizza").type(ProductType.HOT_DISH).build();
+        TaskEntity task1 = TaskEntity.builder()
+            .id(1L).orderId(10L).station(Station.HOT_KITCHEN).tableNumber("A1")
+            .products(List.of(p)).createdAt(LocalDateTime.now()).build();
+        TaskEntity task2 = TaskEntity.builder()
+            .id(2L).orderId(10L).station(Station.HOT_KITCHEN).tableNumber("A1")
+            .products(List.of(p)).createdAt(LocalDateTime.now()).build();
+
+        when(jpaRepository.findByOrderId(10L)).thenReturn(List.of(task1, task2));
+
+        List<Task> tasks = adapter.findByOrderId(10L);
+
+        assertEquals(2, tasks.size());
+        verify(jpaRepository).findByOrderId(10L);
     }
 }

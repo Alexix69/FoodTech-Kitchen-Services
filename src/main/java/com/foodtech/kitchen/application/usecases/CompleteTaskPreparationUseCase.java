@@ -22,6 +22,10 @@ public class CompleteTaskPreparationUseCase implements CompleteTaskPreparationPo
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException(taskId));
 
+        if (callerRole == null) {
+            throw new AccessDeniedException("Caller role must not be null");
+        }
+
         if (!RoleStationMapper.stationsFor(callerRole).contains(task.getStation())) {
             throw new AccessDeniedException(
                 "Role " + callerRole + " cannot complete tasks at station " + task.getStation()

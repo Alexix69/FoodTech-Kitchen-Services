@@ -299,4 +299,18 @@ class TaskControllerIntegrationTest {
         mockMvc.perform(patch("/api/tasks/" + taskId + "/complete").with(auth()))
             .andExpect(status().isConflict());
     }
+
+    @Test
+    @DisplayName("PATCH /api/tasks/{id}/start with non-existent task returns 404")
+    void shouldReturn404WhenStartingNonExistentTask() throws Exception {
+        mockMvc.perform(patch("/api/tasks/99999/start").with(auth()))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("PATCH /api/tasks/{id}/complete with non-existent task returns 404")
+    void shouldReturn404WhenCompletingNonExistentTask() throws Exception {
+        mockMvc.perform(patch("/api/tasks/99999/complete").with(auth()))
+            .andExpect(status().isNotFound());
+    }
 }
